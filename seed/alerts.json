@@ -1,0 +1,30 @@
+[
+  {
+    "id": "alert-0001",
+    "timestamp": "2025-10-11T12:00:00Z",
+    "src_ip": "10.0.0.5",
+    "dst_ip": "10.0.0.10",
+    "src_port": 51234,
+    "dst_port": 80,
+    "proto": "TCP",
+    "label": "DDoS_SYN",
+    "score": 0.96,
+    "severity": "high",
+    "top_features": [{"name":"pkt_rate","contrib":0.41},{"name":"syn_ratio","contrib":0.32}],
+    "explainability": {"method":"shap_tree","version":"0.44.1","sample_id":"s-0001"}
+  },
+  {
+    "id": "alert-0002",
+    "timestamp": "2025-10-11T12:01:00Z",
+    "src_ip": "10.0.0.22",
+    "dst_ip": "10.0.0.10",
+    "src_port": 42233,
+    "dst_port": 22,
+    "proto": "TCP",
+    "label": "BRUTE_FTP",
+    "score": 0.85,
+    "severity": "medium",
+    "top_features": [{"name":"unique_dst_ports","contrib":0.21}],
+    "explainability": {"method":"shap_tree","version":"0.44.1","sample_id":"s-0002"}
+  }
+]
