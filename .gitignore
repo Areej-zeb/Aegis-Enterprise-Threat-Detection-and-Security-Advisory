@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+*.env
+
+# Node/Frontend
+node_modules/
+
+# Build/Artifacts
+dist/
+build/
+artifacts/
+reports/
+
+# Data
+datasets/raw/
+datasets/processed/
+datasets/*.csv
+*.parquet
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Docker
+*.log

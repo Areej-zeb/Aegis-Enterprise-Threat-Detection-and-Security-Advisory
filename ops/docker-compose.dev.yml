@@ -1,0 +1,22 @@
+services:
+  ids:
+    build:
+      context: ..
+      dockerfile: backend/ids/Dockerfile
+    env_file:
+      - ../.env
+    volumes:
+      - ../backend:/app/backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend-mock:
+    image: nginx:alpine
+    volumes:
+      - ../frontend-mock:/usr/share/nginx/html:ro
+    ports:
+      - "5173:80"
+    depends_on:
+      - ids
+    restart: unless-stopped
