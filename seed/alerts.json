@@ -8,10 +8,8 @@
     "dst_port": 80,
     "proto": "TCP",
     "label": "DDoS_SYN",
-    "score": 0.96,
     "severity": "high",
-    "top_features": [{"name":"pkt_rate","contrib":0.41},{"name":"syn_ratio","contrib":0.32}],
-    "explainability": {"method":"shap_tree","version":"0.44.1","sample_id":"s-0001"}
+    "score": 0.96
   },
   {
     "id": "alert-0002",
@@ -22,9 +20,7 @@
     "dst_port": 22,
     "proto": "TCP",
     "label": "BRUTE_FTP",
-    "score": 0.85,
     "severity": "medium",
-    "top_features": [{"name":"unique_dst_ports","contrib":0.21}],
-    "explainability": {"method":"shap_tree","version":"0.44.1","sample_id":"s-0002"}
+    "score": 0.85
   }
 ]

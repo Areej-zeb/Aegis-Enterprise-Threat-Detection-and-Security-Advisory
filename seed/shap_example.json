@@ -1,0 +1,11 @@
+{
+  "method": "shap_tree",
+  "model": "xgboost",
+  "top_features": [
+    {"name": "pkt_rate", "contrib": 0.42},
+    {"name": "syn_ratio", "contrib": 0.31},
+    {"name": "byte_rate", "contrib": 0.25},
+    {"name": "flow_duration", "contrib": 0.18},
+    {"name": "avg_pkt_size", "contrib": 0.14}
+  ]
+}
