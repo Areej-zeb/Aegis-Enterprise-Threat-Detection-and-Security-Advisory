@@ -21,9 +21,13 @@ try {
 # Check if virtual environment exists
 Write-Host "`n✓ Checking virtual environment..." -ForegroundColor Yellow
 if (Test-Path ".venv-1" -or Test-Path "venv" -or Test-Path ".venv") {
-    Write-Host "  ✅ Virtual environment found" -ForegroundColor Green
+    $venvFound = ""
+    if (Test-Path ".venv") { $venvFound = ".venv" }
+    elseif (Test-Path ".venv-1") { $venvFound = ".venv-1" }
+    else { $venvFound = "venv" }
+    Write-Host "  ✅ Virtual environment found: $venvFound" -ForegroundColor Green
 } else {
-    Write-Host "  ⚠️  No virtual environment found. Run: python -m venv .venv-1" -ForegroundColor Yellow
+    Write-Host "  ⚠️  No virtual environment found. Run: python -m venv .venv" -ForegroundColor Yellow
 }
 
 # Check required files
@@ -61,10 +65,10 @@ Write-Host "`n" + "=" * 60
 if ($allPresent) {
     Write-Host "✅ Setup verification passed!" -ForegroundColor Green
     Write-Host "`nNext steps:" -ForegroundColor Cyan
-    Write-Host "  1. Activate virtual environment: .\.venv-1\Scripts\activate" -ForegroundColor Gray
-    Write-Host "  2. Install dependencies: pip install -r requirements.txt" -ForegroundColor Gray
-    Write-Host "  3. Start services: .\start-aegis.ps1" -ForegroundColor Gray
-    Write-Host "  4. Open dashboard: http://localhost:8501" -ForegroundColor Gray
+    Write-Host "  1. Quick Start: .\start-aegis.ps1" -ForegroundColor Gray
+    Write-Host "     OR" -ForegroundColor Gray
+    Write-Host "  2. Manual: Activate virtual environment: .\.venv\Scripts\activate" -ForegroundColor Gray
+    Write-Host "  3. Open dashboard: http://localhost:8501" -ForegroundColor Gray
 } else {
     Write-Host "❌ Setup verification failed. Please fix missing files." -ForegroundColor Red
     exit 1

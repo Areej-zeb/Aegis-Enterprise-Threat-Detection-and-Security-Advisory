@@ -129,32 +129,68 @@ Aegis provides:
 ### Option 2: Local Development
 
 1. **Clone and navigate to project**
-   ```powershell
-   git clone https://github.com/yourusername/aegis.git
-   cd aegis
+   ```bash
+   git clone https://github.com/Areej-zeb/Aegis-Enterprise-Threat-Detection-and-Security-Advisory.git
+   cd Aegis-Enterprise-Threat-Detection-and-Security-Advisory
    ```
 
-2. **Set up Python environment**
+2. **Quick Start with Automation Script**
+   
+   **Windows:**
    ```powershell
-   python -m venv venv
-   .\venv\Scripts\Activate.ps1  # Windows PowerShell
-   # OR
-   # source venv/bin/activate    # Linux/Mac
+   .\start-aegis.ps1
    ```
-
-3. **Install dependencies**
-   ```powershell
-   pip install -r backend/ids/requirements.txt
-   pip install streamlit requests
+   
+   **Linux/Mac:**
+   ```bash
+   chmod +x start-aegis.sh
+   ./start-aegis.sh
    ```
+   
+   The script will automatically:
+   - Create virtual environment (`.venv`)
+   - Install all dependencies
+   - Start backend API on port 8000
+   - Launch dashboard on port 8501
 
-4. **Set environment variables**
-   ```powershell
-   # Windows PowerShell
+3. **Manual Setup (Alternative)**
+   
+   If you prefer manual setup:
+   ```bash
+   # Create virtual environment
+   python -m venv .venv
+   
+   # Activate (Windows PowerShell)
+   .\.venv\Scripts\Activate.ps1
+   
+   # Activate (Linux/Mac)
+   source .venv/bin/activate
+   
+   # Install dependencies
+   pip install -r requirements.txt
+   
+   # Set environment variables (PowerShell)
    $env:MODE="demo"
    $env:PYTHONPATH="$PWD"
    
-   # Linux/Mac
+   # Set environment variables (Linux/Mac)
+   export MODE=demo
+   export PYTHONPATH=$(pwd)
+   
+   # Start backend (in one terminal)
+   uvicorn backend.ids.serve.app:app --reload --host 0.0.0.0 --port 8000
+   
+   # Start dashboard (in another terminal)
+   cd frontend_streamlit
+   streamlit run app.py
+   ```
+
+4. **Access the application**
+   - **Streamlit Dashboard**: http://localhost:8501
+   - **FastAPI API Docs**: http://localhost:8000/docs
+   - **API Health Check**: http://localhost:8000/api/health
+
+---
    # export MODE=demo
    # export PYTHONPATH=$(pwd)
    ```

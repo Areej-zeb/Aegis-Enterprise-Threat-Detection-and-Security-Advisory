@@ -19,20 +19,29 @@ PYTHON_VERSION=$(python3 --version)
 echo "✓ Python found: $PYTHON_VERSION"
 
 # Check if virtual environment exists
-if [ ! -d "venv" ]; then
+if [ -d ".venv" ]; then
+    VENV_PATH=".venv"
+elif [ -d "venv" ]; then
+    VENV_PATH="venv"
+else
     echo "Creating virtual environment..."
-    python3 -m venv venv
+    python3 -m venv .venv
+    VENV_PATH=".venv"
     echo "✓ Virtual environment created"
 fi
 
 # Activate virtual environment
-echo "Activating virtual environment..."
-source venv/bin/activate
+echo "Activating virtual environment ($VENV_PATH)..."
+source "$VENV_PATH/bin/activate"
 
 # Install dependencies if needed
 echo "Checking dependencies..."
-pip install -q -r backend/ids/requirements.txt
-pip install -q streamlit requests plotly
+if [ -f "requirements.txt" ]; then
+    pip install -q -r requirements.txt
+else
+    pip install -q -r backend/ids/requirements.txt
+    pip install -q streamlit requests plotly
+fi
 
 echo "✓ Dependencies installed"
 echo ""

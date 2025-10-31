@@ -16,20 +16,30 @@ try {
 }
 
 # Check if virtual environment exists
-if (-not (Test-Path "venv")) {
+$venvPath = ""
+if (Test-Path ".venv") {
+    $venvPath = ".venv"
+} elseif (Test-Path "venv") {
+    $venvPath = "venv"
+} else {
     Write-Host "Creating virtual environment..." -ForegroundColor Yellow
-    python -m venv venv
+    python -m venv .venv
+    $venvPath = ".venv"
     Write-Host "✓ Virtual environment created" -ForegroundColor Green
 }
 
 # Activate virtual environment
-Write-Host "Activating virtual environment..." -ForegroundColor Yellow
-& .\venv\Scripts\Activate.ps1
+Write-Host "Activating virtual environment ($venvPath)..." -ForegroundColor Yellow
+& ".\$venvPath\Scripts\Activate.ps1"
 
 # Install dependencies if needed
 Write-Host "Checking dependencies..." -ForegroundColor Yellow
-pip install -q -r backend/ids/requirements.txt
-pip install -q streamlit requests plotly
+if (Test-Path "requirements.txt") {
+    pip install -q -r requirements.txt
+} else {
+    pip install -q -r backend/ids/requirements.txt
+    pip install -q streamlit requests plotly
+}
 
 Write-Host "✓ Dependencies installed" -ForegroundColor Green
 Write-Host ""
@@ -49,7 +59,7 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", `
     "& {`
         `$env:MODE='demo'; `
         `$env:PYTHONPATH='$PWD'; `
-        .\venv\Scripts\Activate.ps1; `
+        if (Test-Path '.venv\Scripts\Activate.ps1') { .\.venv\Scripts\Activate.ps1 } else { .\venv\Scripts\Activate.ps1 }; `
         Write-Host 'IDS Backend starting on http://localhost:8000' -ForegroundColor Green; `
         uvicorn backend.ids.serve.app:app --reload --host 0.0.0.0 --port 8000`
     }"

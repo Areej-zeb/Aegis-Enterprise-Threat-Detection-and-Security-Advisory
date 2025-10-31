@@ -21,9 +21,14 @@ fi
 # Check if virtual environment exists
 echo -e "\n✓ Checking virtual environment..."
 if [ -d ".venv-1" ] || [ -d "venv" ] || [ -d ".venv" ]; then
-    echo "  ✅ Virtual environment found"
+    VENV_FOUND=""
+    if [ -d ".venv" ]; then VENV_FOUND=".venv"
+    elif [ -d ".venv-1" ]; then VENV_FOUND=".venv-1"
+    else VENV_FOUND="venv"
+    fi
+    echo "  ✅ Virtual environment found: $VENV_FOUND"
 else
-    echo "  ⚠️  No virtual environment found. Run: python3 -m venv .venv-1"
+    echo "  ⚠️  No virtual environment found. Run: python3 -m venv .venv"
 fi
 
 # Check required files
@@ -62,10 +67,10 @@ echo "============================================================"
 if [ "$ALL_PRESENT" = true ]; then
     echo "✅ Setup verification passed!"
     echo -e "\nNext steps:"
-    echo "  1. Activate virtual environment: source .venv-1/bin/activate"
-    echo "  2. Install dependencies: pip install -r requirements.txt"
-    echo "  3. Start services: ./start-aegis.sh"
-    echo "  4. Open dashboard: http://localhost:8501"
+    echo "  1. Quick Start: ./start-aegis.sh"
+    echo "     OR"
+    echo "  2. Manual: Activate virtual environment: source .venv/bin/activate"
+    echo "  3. Open dashboard: http://localhost:8501"
 else
     echo "❌ Setup verification failed. Please fix missing files."
     exit 1
