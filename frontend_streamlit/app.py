@@ -742,25 +742,30 @@ with tab5:
         with col1:
             st.markdown("#### 🎯 Attack Pattern Detection")
             
-            # Attack type distribution
+            # Attack type distribution (exclude benign traffic)
             if "label" in df.columns:
-                attack_counts = df["label"].value_counts()
-                most_common = attack_counts.index[0] if len(attack_counts) > 0 else "Unknown"
+                # Filter out benign traffic to show only attacks
+                df_attacks = df[df["label"].str.lower() != "benign"]
+                attack_counts = df_attacks["label"].value_counts()
+                most_common = attack_counts.index[0] if len(attack_counts) > 0 else "No attacks detected"
                 
                 st.markdown(f"""
                 **Most Prevalent Attack:** `{most_common}`  
                 **Attack Diversity:** {len(attack_counts)} unique attack types detected  
-                **Total Incidents:** {len(df)} alerts
+                **Total Attack Incidents:** {len(df_attacks)} alerts
                 """)
                 
-                # Attack pattern chart
-                fig = px.pie(
-                    values=attack_counts.values,
-                    names=attack_counts.index,
-                    title="Attack Type Distribution",
-                    hole=0.4,
-                )
-                st.plotly_chart(fig, width='stretch')
+                # Attack pattern chart (only attacks, no benign)
+                if len(attack_counts) > 0:
+                    fig = px.pie(
+                        values=attack_counts.values,
+                        names=attack_counts.index,
+                        title="Attack Type Distribution",
+                        hole=0.4,
+                    )
+                    st.plotly_chart(fig, width='stretch')
+                else:
+                    st.info("No attacks detected in current data.")
         
         with col2:
             st.markdown("#### 🚨 Severity Analysis")
