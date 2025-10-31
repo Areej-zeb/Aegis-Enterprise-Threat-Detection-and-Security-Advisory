@@ -1,63 +1,121 @@
-# ==============================================================================
-# Aegis IDS - Comprehensive .gitignore
-# ==============================================================================
+# Python# ==============================================================================
 
-# Python
-# ------------------------------------------------------------------------------
-__pycache__/
-*.py[cod]
+__pycache__/# Aegis IDS - Comprehensive .gitignore
+
+*.py[cod]# ==============================================================================
+
 *$py.class
-*.so
+
+*.so# Python
+
+.Python# ------------------------------------------------------------------------------
+
+build/__pycache__/
+
+dist/*.py[cod]
+
+*.egg-info/*$py.class
+
+pip-log.txt*.so
+
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
+
+# Virtual Environmentsbuild/
+
+.venv/develop-eggs/
+
+venv/dist/
+
+env/downloads/
+
+ENV/eggs/
+
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
+
+# Environment Variableslib/
+
+.envlib64/
+
+.env.localparts/
+
+*.envsdist/
+
+!.env.examplevar/
+
 wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+
+# Testingshare/python-wheels/
+
+.pytest_cache/*.egg-info/
+
+.coverage.installed.cfg
+
+htmlcov/*.egg
+
+*.logMANIFEST
+
 pip-log.txt
-pip-delete-this-directory.txt
 
-# Virtual Environments
-# ------------------------------------------------------------------------------
-venv/
+# IDEspip-delete-this-directory.txt
+
+.vscode/
+
+.idea/# Virtual Environments
+
+*.swp# ------------------------------------------------------------------------------
+
+*~venv/
+
 env/
-ENV/
-.venv/
-.venv-1/
-env.bak/
-venv.bak/
 
-# Environment Variables
-# ------------------------------------------------------------------------------
-.env
-.env.local
-.env.*.local
-*.env
-!.env.example
+# OSENV/
 
-# Testing & Coverage
-# ------------------------------------------------------------------------------
-htmlcov/
+.DS_Store.venv/
+
+Thumbs.dbenv.bak/
+
+*.bakvenv.bak/
+
+
+
+# ML/Data# Environment Variables
+
+*.h5# ------------------------------------------------------------------------------
+
+*.pkl.env
+
+*.pickle.env.local
+
+artifacts/*.joblib.env.*.local
+
+!artifacts/xgb_baseline.joblib*.env
+
+datasets/raw/!.env.example
+
+datasets/processed/
+
+*.csv# Testing & Coverage
+
+*.parquet# ------------------------------------------------------------------------------
+
+!datasets/index.yamlhtmlcov/
+
 .tox/
-.nox/
-.coverage
+
+# Streamlit.nox/
+
+.streamlit/secrets.toml.coverage
+
 .coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
+
+# Misc.cache
+
+tmp/nosetests.xml
+
+temp/coverage.xml
+
+logs/*.cover
+
 *.log
 .pytest_cache/
 .mypy_cache/
