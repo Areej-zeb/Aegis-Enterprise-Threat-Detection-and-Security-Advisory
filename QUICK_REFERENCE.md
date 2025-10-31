@@ -1,5 +1,9 @@
 # 🛡️ Aegis IDS - Quick Reference
 
+## Requirements
+- **Python**: 3.9+ (tested on 3.10, 3.11, 3.12)
+- **OS**: Ubuntu/Debian or WSL Ubuntu
+
 ## One-Command Setup
 ```bash
 git clone https://github.com/Areej-zeb/Aegis-Enterprise-Threat-Detection-and-Security-Advisory.git

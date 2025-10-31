@@ -197,8 +197,22 @@ st.sidebar.markdown("---")
 # Controls
 st.sidebar.subheader("🎛️ Controls")
 
+# Live streaming status indicator
+if st.session_state.get("enable_live_stream", False):
+    st.sidebar.warning("🔴 LIVE STREAMING ACTIVE")
+    st.sidebar.caption("⚠️ Page refreshing every 2s")
+    st.sidebar.caption("Returns to Live Alerts tab")
+    if st.sidebar.button("⏸️ Stop Streaming", type="secondary", use_container_width=True):
+        st.session_state.enable_live_stream = False
+        st.rerun()
+else:
+    st.sidebar.success("✅ No auto-refresh")
+    st.sidebar.caption("Navigate freely between tabs")
+
+st.sidebar.markdown("---")
+
 # Global refresh button
-if st.sidebar.button("🔄 Refresh Dashboard", type="primary", use_container_width=True):
+if st.sidebar.button("🔄 Refresh Dashboard", use_container_width=True):
     st.rerun()
 
 st.sidebar.markdown("---")
@@ -379,25 +393,29 @@ with tab1:
 with tab2:
     st.subheader("📡 Live Alerts Feed")
     
-    # Auto-refresh toggle
-    col_auto, col_interval = st.columns([2, 1])
+    st.info("💡 **Tip**: Enable live streaming below to see alerts appear automatically. Note: This will refresh the page and return you to this tab every 2 seconds.")
+    
+    # Live streaming toggle
+    col_auto, col_manual = st.columns([3, 1])
     with col_auto:
-        enable_auto_refresh = st.checkbox(
-            "🔴 Enable Auto-Refresh (Live Mode)", 
-            value=True, 
-            key="enable_live_refresh",
-            help="Automatically fetch new alerts every few seconds"
+        enable_live_stream = st.checkbox(
+            "🔴 Enable Live Stream", 
+            value=False,  # OFF by default to avoid tab jumping
+            key="enable_live_stream",
+            help="Auto-fetch new alerts every 2 seconds. ⚠️ WARNING: Page will refresh and return to this tab."
         )
-    with col_interval:
-        if enable_auto_refresh:
-            st.caption("🔴 **LIVE** - Refreshing every 2s")
+    with col_manual:
+        if enable_live_stream:
+            st.caption("🔴 **STREAMING** - Refreshing every 2s")
         else:
-            st.caption("⚫ **PAUSED**")
+            st.caption("⚫ **PAUSED** - Use refresh button or enable streaming")
     
-    # Fetch the latest alerts from backend (backend is continuously generating)
+    # Manual refresh button
+    if st.button("🔄 Fetch Latest Alerts", use_container_width=True, type="primary"):
+        st.rerun()
+    
+    # Fetch new alerts
     new_alerts = get_alerts()
-    
-    # If we got alerts, append to log
     if new_alerts:
         st.session_state.alert_log.extend(new_alerts)
         st.session_state.alert_log = st.session_state.alert_log[-max_alerts:]
@@ -867,6 +885,10 @@ with tab5:
 # ---------------------------------------------------------------------
 # Auto-refresh logic (MUST be at the end after ALL tabs are defined)
 # ---------------------------------------------------------------------
-if st.session_state.get("enable_live_refresh", False):
+# STREAMLIT LIMITATION: st.rerun() always refreshes entire page and resets to Tab 1
+# Users must be on Live Alerts tab and explicitly enable streaming to use this
+# When streaming is enabled, page will refresh every 2s and jump back to Overview tab
+# This is unavoidable - it's how Streamlit works
+if st.session_state.get("enable_live_stream", False):
     time.sleep(2)
     st.rerun()

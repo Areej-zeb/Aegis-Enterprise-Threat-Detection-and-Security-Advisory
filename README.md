@@ -5,10 +5,16 @@ Enterprise-grade web-based threat detection and security monitoring system with 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+**Python Version**: Python 3.9+ (tested on 3.10, 3.11, 3.12)
+
 ```bash
 # Ubuntu/Debian or WSL Ubuntu
 sudo apt update
 sudo apt install -y python3 python3-pip python3-venv
+
+# Verify Python version (must be 3.9+)
+python3 --version
 
 # For WSL Ubuntu on Windows (first time only)
 wsl --install -d Ubuntu
