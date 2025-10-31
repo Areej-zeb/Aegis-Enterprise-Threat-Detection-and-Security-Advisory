@@ -225,8 +225,8 @@ st.sidebar.subheader("🔍 Filters")
 # Severity filter
 severity_filter = st.sidebar.multiselect(
     "Severity Level",
-    options=["high", "medium", "low"],
-    default=["high", "medium", "low"]
+    options=["critical", "high", "medium", "low"],
+    default=["critical", "high", "medium", "low"]
 )
 
 # Attack type filter
@@ -428,6 +428,9 @@ with tab2:
             df["timestamp"] = pd.to_datetime(df["timestamp"], format='ISO8601')
             df = df.sort_values(by="timestamp", ascending=False).reset_index(drop=True)
 
+        # Apply filters
+        filtered_df = filter_alerts(df, severity_filter, attack_filter, protocol_filter, confidence_threshold)
+
         # Show statistics
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -442,12 +445,17 @@ with tab2:
 
         st.divider()
 
+        # Display filtered results
+        st.caption(f"Showing {len(filtered_df)} of {len(df)} alerts (after filters)")
+
         # Display columns
-        cols = [c for c in ["timestamp", "src_ip", "dst_ip", "proto", "label", "score", "severity"] if c in df.columns]
+        cols = [c for c in ["timestamp", "src_ip", "dst_ip", "proto", "label", "score", "severity"] if c in filtered_df.columns]
 
         def highlight_severity(row):
             if "severity" in row:
-                if row["severity"] == "high":
+                if row["severity"] == "critical":
+                    return ["background-color: #ff0000; color: white; font-weight: bold"] * len(row)
+                elif row["severity"] == "high":
                     return ["background-color: #ffcccc; color: #8b0000; font-weight: bold"] * len(row)
                 elif row["severity"] == "medium":
                     return ["background-color: #ffe4b3; color: #cc6600; font-weight: bold"] * len(row)
@@ -455,17 +463,20 @@ with tab2:
                     return ["background-color: #d4edda; color: #155724"] * len(row)
             return [""] * len(row)
 
-        styled_df = df[cols].style.apply(highlight_severity, axis=1)
-        st.dataframe(styled_df, width='stretch', height=500)
-        
-        # Download option
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Download Alerts as CSV",
-            data=csv,
-            file_name=f"aegis_alerts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-            mime="text/csv",
-        )
+        if len(filtered_df) > 0:
+            styled_df = filtered_df[cols].style.apply(highlight_severity, axis=1)
+            st.dataframe(styled_df, width='stretch', height=500)
+            
+            # Download option
+            csv = filtered_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Download Alerts as CSV",
+                data=csv,
+                file_name=f"aegis_alerts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                mime="text/csv",
+            )
+        else:
+            st.warning("⚠️ No alerts match the current filter settings. Try adjusting the filters in the sidebar.")
     else:
         st.warning("No alerts received yet. Waiting for data...")
 
