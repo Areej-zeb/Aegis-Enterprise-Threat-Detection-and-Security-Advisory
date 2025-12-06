@@ -117,10 +117,27 @@ AegisFrontend/
 
 ## 🔧 Setup Instructions
 
-### Option 1: Quick Start (Recommended)
-Follow [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup.
+### Option 1: Docker (Recommended for Production)
+Run the entire stack with Docker:
 
-### Option 2: Detailed Setup
+```bash
+# Copy environment file
+cp .env.example .env
+
+# Edit .env with your MongoDB Atlas credentials
+
+# Build and start
+docker compose up -d
+
+# Access at http://localhost:5173
+```
+
+See [DOCKER.md](DOCKER.md) for complete Docker documentation.
+
+### Option 2: Quick Start (Development)
+Follow [QUICKSTART.md](QUICKSTART.md) for a 5-minute local setup.
+
+### Option 3: Detailed Setup
 Follow [SETUP.md](SETUP.md) for comprehensive instructions including:
 - MongoDB installation for all platforms
 - Environment configuration
