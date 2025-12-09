@@ -1,0 +1,285 @@
+# Python# ==============================================================================
+
+__pycache__/# Aegis IDS - Comprehensive .gitignore
+
+*.py[cod]# ==============================================================================
+
+*$py.class
+
+*.so# Python
+
+.Python# ------------------------------------------------------------------------------
+
+build/__pycache__/
+
+dist/*.py[cod]
+
+*.egg-info/*$py.class
+
+pip-log.txt*.so
+
+.Python
+
+# Virtual Environmentsbuild/
+venv/
+
+.venv/develop-eggs/
+
+venv/dist/
+
+env/downloads/
+
+ENV/eggs/
+
+.eggs/
+
+# Environment Variableslib/
+
+.envlib64/
+
+.env.localparts/
+
+*.envsdist/
+
+!.env.examplevar/
+
+wheels/
+
+# Testingshare/python-wheels/
+
+.pytest_cache/*.egg-info/
+
+.coverage.installed.cfg
+
+htmlcov/*.egg
+
+*.logMANIFEST
+
+pip-log.txt
+
+# IDEspip-delete-this-directory.txt
+
+.vscode/
+
+.idea/# Virtual Environments
+
+*.swp# ------------------------------------------------------------------------------
+
+*~venv/
+
+env/
+
+# OSENV/
+
+.DS_Store.venv/
+
+Thumbs.dbenv.bak/
+
+*.bakvenv.bak/
+
+
+
+# ML/Data# Environment Variables
+
+*.h5# ------------------------------------------------------------------------------
+
+*.pkl.env
+
+*.pickle.env.local
+
+artifacts/*.joblib.env.*.local
+
+!artifacts/xgb_baseline.joblib*.env
+
+datasets/raw/!.env.example
+
+datasets/processed/
+
+*.csv# Testing & Coverage
+
+*.parquet# ------------------------------------------------------------------------------
+
+!datasets/index.yamlhtmlcov/
+
+.tox/
+
+# Streamlit.nox/
+
+.streamlit/secrets.toml.coverage
+
+.coverage.*
+
+# Misc.cache
+
+tmp/nosetests.xml
+
+temp/coverage.xml
+
+logs/*.cover
+
+*.log
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# IDEs & Editors
+# ------------------------------------------------------------------------------
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.\#*
+
+# Eclipse
+.project
+.classpath
+.settings/
+.loadpath
+.externalToolBuilders/
+
+# Jupyter Notebooks
+# ------------------------------------------------------------------------------
+.ipynb_checkpoints
+*.ipynb
+
+# Operating Systems
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Node.js (for future React frontend)
+# ------------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+.yarn-integrity
+.pnp
+.pnp.js
+
+# Frontend builds
+# ------------------------------------------------------------------------------
+frontend-react/build/
+frontend-react/dist/
+*.local
+
+# ML/Data Science
+# ------------------------------------------------------------------------------
+# Model files
+*.h5
+*.pkl
+*.pickle
+*.onnx
+*.pt
+*.pth
+*.weights
+
+# Keep specific baseline model
+artifacts/*.joblib
+!artifacts/xgb_baseline.joblib
+
+# Experiment tracking
+mlruns/
+wandb/
+.wandb/
+
+# Data files
+# ------------------------------------------------------------------------------
+datasets/raw/
+datasets/processed/
+*.csv
+*.parquet
+*.feather
+*.hdf5
+*.arrow
+
+# Keep dataset index
+!datasets/index.yaml
+
+# Logs
+# ------------------------------------------------------------------------------
+logs/
+*.log
+log/
+*.log.*
+
+# Temporary files
+# ------------------------------------------------------------------------------
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.pid
+*.seed
+*.pid.lock
+
+# Docker
+# ------------------------------------------------------------------------------
+.dockerignore
+docker-compose.override.yml
+
+# Database
+# ------------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Streamlit
+# ------------------------------------------------------------------------------
+.streamlit/secrets.toml
+
+# Documentation builds
+# ------------------------------------------------------------------------------
+docs/_build/
+docs/.doctrees/
+site/
+
+# Misc
+# ------------------------------------------------------------------------------
+.cache/
+

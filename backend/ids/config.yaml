@@ -1,0 +1,30 @@
+# IDS config: canonical list of features, labels, and dataset paths
+features:
+  - flow_duration
+  - pkt_rate
+  - syn_ratio
+  - byte_rate
+  - avg_pkt_size
+  - fwd_pkt_count
+  - bwd_pkt_count
+  - fwd_byte_rate
+  - bwd_byte_rate
+  - tcp_flags_ratio
+  - unique_dst_ports
+  - unique_dst_ips
+  - tcp_window_avg
+  - ttl_avg
+  - iat_mean
+  - pkt_size_std
+
+labels:
+  - BENIGN
+  - DDoS_SYN
+  - DDoS_UDP
+  - BRUTE_FTP
+  - SCAN_PORT
+  - MITM_ARP
+
+datasets_root: "datasets/processed"   # relative to project root
+default_dataset: "cicids2017"        # used by loaders if not specified
+seed_alerts: "seed/alerts.json"      # sample alerts for frontend dev

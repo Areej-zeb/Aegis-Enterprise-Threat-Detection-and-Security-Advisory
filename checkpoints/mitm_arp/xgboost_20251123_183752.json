@@ -1,0 +1,48 @@
+{
+  "accuracy": 0.8546930492135971,
+  "f1_macro": 0.8084791001092424,
+  "f1_weighted": 0.8671606008620764,
+  "precision_macro": 0.7786810722152371,
+  "recall_macro": 0.8974579027136171,
+  "roc_auc": 0.9710741726324124,
+  "per_class_precision": {
+    "BENIGN": 0.9905899925317401,
+    "MITM_ARP": 0.5667721518987342
+  },
+  "per_class_recall": {
+    "BENIGN": 0.8288963879515061,
+    "MITM_ARP": 0.9660194174757282
+  },
+  "classification_report": {
+    "BENIGN": {
+      "precision": 0.9905899925317401,
+      "recall": 0.8288963879515061,
+      "f1-score": 0.9025585193249864,
+      "support": 8001.0
+    },
+    "MITM_ARP": {
+      "precision": 0.5667721518987342,
+      "recall": 0.9660194174757282,
+      "f1-score": 0.7143996808934983,
+      "support": 1854.0
+    },
+    "accuracy": 0.8546930492135971,
+    "macro avg": {
+      "precision": 0.7786810722152371,
+      "recall": 0.8974579027136171,
+      "f1-score": 0.8084791001092424,
+      "support": 9855.0
+    },
+    "weighted avg": {
+      "precision": 0.9108580517368549,
+      "recall": 0.8546930492135971,
+      "f1-score": 0.8671606008620764,
+      "support": 9855.0
+    }
+  },
+  "inference_time": 0.06493973731994629,
+  "classes": [
+    "BENIGN",
+    "MITM_ARP"
+  ]
+}

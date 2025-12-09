@@ -1,0 +1,40 @@
+{
+  "dataset": "mitm_arp",
+  "best_model": "XGBoost",
+  "timestamp": "2025-11-23T18:37:52.487107",
+  "models": {
+    "XGBoost": {
+      "accuracy": 0.8546930492135971,
+      "f1_macro": 0.8084791001092424,
+      "f1_weighted": 0.8671606008620764,
+      "precision_macro": 0.7786810722152371,
+      "recall_macro": 0.8974579027136171,
+      "roc_auc": 0.9710741726324124,
+      "per_class_metrics": {
+        "precision": {
+          "BENIGN": 0.9905899925317401,
+          "MITM_ARP": 0.5667721518987342
+        },
+        "recall": {
+          "BENIGN": 0.8288963879515061,
+          "MITM_ARP": 0.9660194174757282
+        },
+        "f1_score": {
+          "BENIGN": 0.9025585193249864,
+          "MITM_ARP": 0.7143996808934983
+        }
+      },
+      "confusion_matrix": [
+        [
+          6632,
+          1369
+        ],
+        [
+          63,
+          1791
+        ]
+      ],
+      "inference_time": 0.06493973731994629
+    }
+  }
+}

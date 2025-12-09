@@ -1,0 +1,38 @@
+{
+  "dataset": "mitm_arp",
+  "model": "CNN-LSTM",
+  "timestamp": "2025-11-23T22:29:52.000497",
+  "overall_metrics": {
+    "accuracy": 0.7218670725520041,
+    "f1_macro": 0.6641300125859134,
+    "f1_weighted": 0.7509899508168384,
+    "precision_macro": 0.6647393474979681,
+    "recall_macro": 0.7582626200851107,
+    "roc_auc": 0.8477539619845254
+  },
+  "per_class_metrics": {
+    "precision": {
+      "BENIGN": 0.9427609427609428,
+      "MITM_ARP": 0.3867177522349936
+    },
+    "recall": {
+      "BENIGN": 0.6999125109361329,
+      "MITM_ARP": 0.8166127292340885
+    },
+    "f1_score": {
+      "BENIGN": 0.8033856968653612,
+      "MITM_ARP": 0.5248743283064656
+    }
+  },
+  "confusion_matrix": [
+    [
+      5600,
+      2401
+    ],
+    [
+      340,
+      1514
+    ]
+  ],
+  "best_val_f1": 0.6775082488085054
+}

@@ -1,0 +1,122 @@
+/* MetricsSummaryCard.css */
+
+.metrics-card {
+  width: 100%;
+  background-color: #020617;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.8);
+  padding: 24px;
+  box-shadow: none;
+  position: relative;
+}
+
+.metrics-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+
+.metrics-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.metrics-card__subtitle {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+  text-align: right;
+}
+
+.metrics-card__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.metrics-card__tile {
+  background-color: #0f172a;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  box-shadow: none;
+  border: none;
+}
+
+.metrics-card__tile:hover {
+  background-color: #111827;
+}
+
+.metrics-card__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9ca3af;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.metrics-card__value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Emphasis variants */
+.metrics-card__value--primary {
+  color: #3b82f6;
+}
+
+.metrics-card__value--warning {
+  color: #f59e0b;
+}
+
+.metrics-card__value--danger {
+  color: #ef4444;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .metrics-card__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .metrics-card {
+    padding: 16px;
+  }
+
+  .metrics-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .metrics-card__subtitle {
+    text-align: left;
+  }
+
+  .metrics-card__grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .metrics-card__title {
+    font-size: 16px;
+  }
+
+  .metrics-card__value {
+    font-size: 20px;
+  }
+}
