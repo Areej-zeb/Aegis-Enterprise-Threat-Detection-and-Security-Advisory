@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { LockKeyhole, Mail } from "lucide-react";
 import "../index.css";
 
@@ -8,16 +8,20 @@ import FormField from "../components/form/FormField.jsx";
 import TextInput from "../components/form/TextInput.jsx";
 import PasswordInput from "../components/form/PasswordInput.jsx";
 import PrimaryButton from "../components/buttons/PrimaryButton.jsx";
-import authService from "../utils/authService.js";
+import { useAuth } from "../context/AuthContext.tsx";
 
 function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state?.from?.pathname) || "/dashboard";
+
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -32,18 +36,13 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const result = await authService.login(form.email, form.password);
-      
-      if (result.success) {
-        // Login successful, redirect to dashboard
-        navigate("/dashboard");
-      } else {
-        // Login failed, show backend error message
-        setError(result.error);
-      }
+      await login(form.email, form.password);
+      // Login successful, redirect to intended destination or dashboard
+      navigate(from, { replace: true });
     } catch (err) {
-      // Unexpected error
-      setError("Unable to reach the server. Please try again.");
+      // Login failed, show error message
+      const errorMessage = err instanceof Error ? err.message : "Invalid credentials or server error.";
+      setError(errorMessage);
       console.error("Login error:", err);
     } finally {
       setLoading(false);

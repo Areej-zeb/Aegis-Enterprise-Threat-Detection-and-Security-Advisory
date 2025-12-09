@@ -62,7 +62,7 @@ function SignUpPage() {
     setLoading(true);
 
     try {
-      const result = await authService.register(form.email, form.password);
+      const result = await authService.register(form.name, form.email, form.password);
       
       if (result.success) {
         // Registration successful, show success message and redirect to login

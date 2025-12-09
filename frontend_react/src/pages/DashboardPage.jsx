@@ -22,6 +22,10 @@ import ThreatsDetectedCard from "../components/charts/ThreatsDetectedCard.tsx";
 import { StatCard, StatusPill } from "../components/common";
 import { checkHealth, fetchLiveDetections } from "../api/aegisClient.ts";
 import { aggregateAlertsByTime } from "../utils/chartDataUtils.ts";
+import { useAlertTimeSeries } from "../state/AlertTimeSeriesContext.tsx";
+
+// Type for threat data points with timestamps
+// Each point has: { timestamp: number, count: number }
 
 function DashboardPage() {
   const [metrics, setMetrics] = useState(null);
@@ -31,6 +35,9 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Use the global alert time-series store
+  const { series: alertSeries, addIncomingAlerts } = useAlertTimeSeries();
 
   // Model health from real trained models
   const [modelHealth, setModelHealth] = useState({
@@ -56,6 +63,7 @@ function DashboardPage() {
     level: "moderate",
     inputsSummary: "50 active alerts · 3 exposed services · 2 high-severity findings",
   });
+
 
   // Calculate top attacks from REAL model detections
   const topAttacks = useMemo(() => {
@@ -136,13 +144,13 @@ function DashboardPage() {
         attack_counts: attackTypeCounts,
       });
 
-      // Process for time-series chart - aggregate attacks by time buckets
-      // Use 5-minute buckets for last 24 hours
+      // Feed alerts to the global time-series store
+      // Filter for attack alerts only and add them to the global store
       const attackAlerts = transformedAlerts.filter(alert => alert.label === 'ATTACK');
-      const chartDataArray = aggregateAlertsByTime(attackAlerts, 1440, 5)
-        .map(bucket => ({ label: bucket.label, value: bucket.value }));
-
-      setChartData(chartDataArray);
+      if (attackAlerts.length > 0) {
+        // Use 30-minute window with 1-minute buckets for Dashboard
+        addIncomingAlerts(attackAlerts, 30 * 60, 60);
+      }
 
       // Calculate model health from real detections
       const attackDetections = transformedAlerts.filter(d => d.label === 'ATTACK');
@@ -176,6 +184,57 @@ function DashboardPage() {
     await loadDashboardData();
     setIsRefreshing(false);
   };
+
+  // Convert global alert series to chartData format for Dashboard
+  // Dashboard shows total count (sum of all severities) with 30-minute window
+  useEffect(() => {
+    // Filter to last 30 minutes and aggregate by 1-minute buckets
+    const now = Date.now();
+    const THIRTY_MIN = 30 * 60 * 1000;
+    const windowStart = now - THIRTY_MIN;
+    const BUCKET_MS = 60 * 1000; // 1 minute
+    
+    // Filter and aggregate the global series
+    const filtered = alertSeries.filter(p => p.timestamp >= windowStart);
+    
+    if (filtered.length === 0) {
+      setChartData([]);
+      return;
+    }
+
+    // Group by 1-minute buckets and sum all severities
+    const buckets = new Map();
+    filtered.forEach(point => {
+      const bucketStart = Math.floor(point.timestamp / BUCKET_MS) * BUCKET_MS;
+      const existing = buckets.get(bucketStart);
+      if (existing) {
+        existing.value += point.critical + point.high + point.medium + point.low;
+      } else {
+        buckets.set(bucketStart, {
+          timestamp: bucketStart,
+          value: point.critical + point.high + point.medium + point.low,
+        });
+      }
+    });
+
+    // Fill gaps and format for chart
+    const result = [];
+    let current = Math.floor(windowStart / BUCKET_MS) * BUCKET_MS;
+    const last = Math.floor(now / BUCKET_MS) * BUCKET_MS;
+
+    while (current <= last) {
+      const existing = buckets.get(current);
+      const date = new Date(current);
+      const label = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      result.push({
+        label,
+        value: existing ? existing.value : 0,
+      });
+      current += BUCKET_MS;
+    }
+
+    setChartData(result);
+  }, [alertSeries]);
 
   useEffect(() => {
     // Load real model data on mount

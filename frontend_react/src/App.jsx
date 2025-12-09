@@ -9,6 +9,8 @@ import SettingsPage from "./pages/SettingsPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
 import MLDetectionPage from "./pages/MLDetectionPage.jsx";
 import AppShell from "./components/layout/AppShell.jsx";
+import { AlertTimeSeriesProvider } from "./state/AlertTimeSeriesContext.tsx";
+import RequireAuth from "./routes/RequireAuth.tsx";
 
 function useCursorGlow() {
   useEffect(() => {
@@ -91,46 +93,60 @@ function App() {
   useCursorGlow();
 
   return (
-    <>
+    <AlertTimeSeriesProvider>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <AppShell>
-              <DashboardPage />
-            </AppShell>
-          }
-        />
-        <Route
-          path="/ids"
-          element={
-            <AppShell>
-              <IDSPage />
-            </AppShell>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <AppShell>
-              <SettingsPage />
-            </AppShell>
-          }
-        />
-        <Route
-          path="/ml-detection"
-          element={
-            <AppShell>
-              <MLDetectionPage />
-            </AppShell>
-          }
-        />
+
+        {/* Protected routes */}
+        <Route element={<RequireAuth />}>
+          <Route
+            path="/"
+            element={
+              <AppShell>
+                <DashboardPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <AppShell>
+                <DashboardPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/ids"
+            element={
+              <AppShell>
+                <IDSPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <AppShell>
+                <SettingsPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/ml-detection"
+            element={
+              <AppShell>
+                <MLDetectionPage />
+              </AppShell>
+            }
+          />
+        </Route>
+
+        {/* Fallback */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </>
+    </AlertTimeSeriesProvider>
   );
 }
 

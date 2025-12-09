@@ -446,10 +446,27 @@ export async function runDetection(
 export async function getExplanation(
   detectionId: string
 ): Promise<Explanation> {
-  const response = await fetch(buildUrl(`/api/explainability/${detectionId}`));
+  // URL encode the detection ID to handle special characters
+  const encodedId = encodeURIComponent(detectionId);
+  const response = await fetch(buildUrl(`/api/explainability/${encodedId}`));
   
   if (!response.ok) {
-    throw new Error('EXPLANATION_NOT_AVAILABLE');
+    // Try to get more specific error information
+    let errorMessage = 'EXPLANATION_NOT_AVAILABLE';
+    try {
+      const errorData = await response.json();
+      if (errorData.detail) {
+        errorMessage = errorData.detail;
+      }
+    } catch {
+      // If response is not JSON, use status-based error
+      if (response.status === 404) {
+        errorMessage = 'DETECTION_NOT_FOUND';
+      } else if (response.status === 500) {
+        errorMessage = 'EXPLANATION_SERVER_ERROR';
+      }
+    }
+    throw new Error(errorMessage);
   }
   
   return response.json();

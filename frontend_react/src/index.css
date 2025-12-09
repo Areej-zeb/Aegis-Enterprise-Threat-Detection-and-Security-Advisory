@@ -441,13 +441,38 @@ button {
 }
 
 
-/* Top of sidebar: center logo on same axis as icons */
-.aegis-sidebar-top {
+/* Logo Section at Top of Sidebar */
+.aegis-sidebar-logo-section {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
+  padding: 16px 12px;
   margin-bottom: 18px;
-  gap: 8px;
+}
+
+.aegis-sidebar-logo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  transition: height 0.2s ease;
+}
+
+.aegis-sidebar-logo--collapsed {
+  height: 24px;
+}
+
+.aegis-sidebar-logo-text {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #f0f4ff;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.aegis-shell--collapsed .aegis-sidebar-logo-section {
+  padding: 16px 8px;
 }
 
 .aegis-shell--collapsed .aegis-nav-item {
@@ -455,29 +480,6 @@ button {
   padding: 10px 0;
   margin: 0 6px;
   border-radius: 999px;
-}
-
-
-.aegis-sidebar-logo-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0;
-}
-
-/* Default (NOT collapsed) – make it bigger */
-.aegis-sidebar-logo {
-  height: 158px;
-  /* 80% increase from original 88px */
-  width: auto;
-  transition: height 0.2s ease, opacity 0.2s ease;
-}
-
-/* Collapsed – smaller logo only when shell is collapsed */
-.aegis-shell--collapsed .aegis-sidebar-logo {
-  height: 40px;
-  opacity: 1;
-  /* full opacity for logo */
 }
 
 .aegis-sidebar-toggle {
@@ -544,42 +546,27 @@ button {
 }
 
 .aegis-nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.6);
   color: #f0f0f0;
 }
 
 .aegis-nav-item--active {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  /* brighter gradient */
+  background: rgba(15, 23, 42, 0.6);
   color: #ffffff;
-  box-shadow: 0 0 16px rgba(139, 92, 246, 0.6);
-  /* stronger glow */
   position: relative;
   opacity: 1;
-  /* full opacity for active item */
-}
-
-/* remove extra outside bar on active nav item */
-.aegis-nav-item--active::before {
-  content: none;
 }
 
 .aegis-nav-active-bar {
   position: absolute;
-  left: 6px;
-  top: 8px;
-  bottom: 8px;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 28px;
   width: 3px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #60a5fa, #c084fc);
-  /* brighter gradient */
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.aegis-nav-item--active .aegis-nav-active-bar {
-  opacity: 1;
-  /* full opacity for active bar */
+  border-radius: 0 999px 999px 0;
+  background: #7b5cff;
+  box-shadow: 0 0 8px rgba(123, 92, 255, 0.6);
 }
 
 /* (tooltip-on-collapse removed; labels now visible when expanded) */
@@ -627,20 +614,11 @@ button {
 }
 
 .aegis-shell--collapsed .aegis-nav-item--active {
-  box-shadow: 0 0 18px rgba(168, 85, 247, 0.55);
+  background: rgba(15, 23, 42, 0.6);
 }
 
 .aegis-shell--collapsed .aegis-nav-item:hover {
   background: rgba(15, 23, 42, 0.9);
-  box-shadow: 0 0 14px rgba(129, 140, 248, 0.35);
-}
-
-/* In collapsed mode, inset the active indicator bar closer to the edge
-   so there's a comfortable gap between the bar and the icon */
-.aegis-shell--collapsed .aegis-nav-active-bar {
-  left: 2px;
-  top: 9px;
-  bottom: 9px;
 }
 
 .aegis-sidebar-footer {
@@ -688,14 +666,60 @@ button {
   display: none;
 }
 
+.aegis-logout-btn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #ef4444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+  z-index: 100;
+  position: relative;
+}
+
+.aegis-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.aegis-logout-btn:active {
+  transform: translateY(0);
+}
+
+.aegis-logout-label {
+  white-space: nowrap;
+}
+
+.aegis-shell--collapsed .aegis-logout-btn {
+  padding: 10px;
+  justify-content: center;
+}
+
+.aegis-shell--collapsed .aegis-logout-label {
+  display: none;
+}
+
 .aegis-page {
-  max-width: 1440px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
+  padding: 0 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 20px;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* GLASS TOP HEADER BAR ----------------------------------- */
@@ -1185,6 +1209,13 @@ button {
     0 0 14px rgba(34, 197, 94, 0.35);
 }
 
+.aegis-alert-card--critical {
+  background: rgba(58, 15, 30, 0.5);
+  border-color: #ff3366;
+  box-shadow: 0 0 0 1px rgba(255, 51, 102, 0.7),
+    0 0 14px rgba(255, 51, 102, 0.35);
+}
+
 .aegis-alert-card:hover {
   transform: translateY(-1px);
 }
@@ -1212,6 +1243,10 @@ button {
 
 .aegis-alert-card--low::before {
   background: #22c55e;
+}
+
+.aegis-alert-card--critical::before {
+  background: #ff3366;
 }
 
 .aegis-alert-card:hover::before {
@@ -1537,12 +1572,26 @@ button {
 
 /* DETAILS */
 .ids-details-section {
-  margin-bottom: 14px;
+  margin-bottom: 20px;
+}
+
+.ids-details-section:last-child {
+  margin-bottom: 0;
 }
 
 .ids-details-section h3 {
   font-size: 14px;
-  margin-bottom: 6px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e5e7eb;
+}
+
+.ids-details-section h3 svg {
+  flex-shrink: 0;
+  margin-right: 4px;
 }
 
 .ids-details-section ul {
@@ -1886,16 +1935,17 @@ button {
 
 /* simple toggle switch */
 .ids-toggle {
-  width: 42px;
+  width: 40px;
   height: 20px;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.6);
   background: rgba(15, 23, 42, 0.9);
-  padding: 1px;
+  padding: 2px;
   display: flex;
   align-items: center;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
+  position: relative;
 }
 
 .ids-toggle-knob {
@@ -1905,6 +1955,7 @@ button {
   background: #e5e7eb;
   transform: translateX(0);
   transition: transform 0.15s ease;
+  flex-shrink: 0;
 }
 
 .ids-toggle--on {
@@ -1913,7 +1964,7 @@ button {
 }
 
 .ids-toggle--on .ids-toggle-knob {
-  transform: translateX(20px);
+  transform: translateX(18px);
 }
 
 .ids-live-kpis {
@@ -2740,7 +2791,7 @@ button {
 .ids-details-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px 16px;
+  gap: 12px 16px;
   margin-top: 8px;
 }
 
@@ -4005,41 +4056,7 @@ img {
   color: #cbd5e1;
 }
 
-.ids-toggle {
-  position: relative;
-  width: 40px;
-  height: 20px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.ids-toggle--on {
-  background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.ids-toggle--off {
-  background: #334155;
-}
-
-.ids-toggle-knob {
-  position: absolute;
-  top: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
-  background: white;
-  transition: left 0.2s ease;
-}
-
-.ids-toggle--on .ids-toggle-knob {
-  left: 22px;
-}
-
-.ids-toggle--off .ids-toggle-knob {
-  left: 2px;
-}
+/* Duplicate toggle styles removed - using the main definition above */
 
 /* Tab Container */
 .ids-tab-container {

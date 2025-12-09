@@ -12,7 +12,7 @@ import {
   Activity,
 } from "lucide-react";
 import aegisLogo from "../../assets/aegis-logo.png";
-import authService from "../../utils/authService.js";
+import { useAuth } from "../../context/AuthContext.tsx";
 import "../../index.css";
 
 const NAV_ITEMS = [
@@ -27,17 +27,12 @@ const NAV_ITEMS = [
 function AppShell({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-
-  // Get user info on mount
-  useEffect(() => {
-    const currentUser = authService.getUser();
-    setUser(currentUser);
-  }, []);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const handleLogout = () => {
-    authService.logout();
+    logout();
     navigate("/login");
   };
 
@@ -70,7 +65,9 @@ function AppShell({ children }) {
   }, [mobileMenuOpen]);
 
   return (
-    <div className="aegis-shell aegis-shell--collapsed">
+    <div
+      className={`aegis-shell ${isCollapsed ? "aegis-shell--collapsed" : ""}`}
+    >
       {/* Mobile Menu Toggle Button */}
       <button
         className="aegis-mobile-menu-toggle"
@@ -86,15 +83,18 @@ function AppShell({ children }) {
         onClick={() => setMobileMenuOpen(false)}
       />
 
-      <aside className={`aegis-sidebar ${mobileMenuOpen ? "mobile-open" : ""}`}>
-        <div className="aegis-sidebar-top">
-          <div className="aegis-sidebar-logo-wrap">
-            <img
-              src={aegisLogo}
-              alt="AEGIS logo"
-              className="aegis-sidebar-logo"
-            />
-          </div>
+      <aside 
+        className={`aegis-sidebar ${mobileMenuOpen ? "mobile-open" : ""}`}
+        onMouseEnter={() => setIsCollapsed(false)}
+        onMouseLeave={() => setIsCollapsed(true)}
+      >
+        {/* Logo Section */}
+        <div className="aegis-sidebar-logo-section">
+          <img
+            src={aegisLogo}
+            alt="Aegis"
+            className={`aegis-sidebar-logo ${isCollapsed ? "aegis-sidebar-logo--collapsed" : ""}`}
+          />
         </div>
 
         <div className="aegis-sidebar-search">
@@ -113,7 +113,9 @@ function AppShell({ children }) {
                 onClick={() => navigate(item.path)}
                 aria-current={isActive ? "page" : undefined}
               >
-                <span className="aegis-nav-active-bar" aria-hidden="true" />
+                {isActive && (
+                  <span className="aegis-nav-active-bar" aria-hidden="true" />
+                )}
                 <span className="aegis-nav-icon">
                   <Icon size={16} strokeWidth={1.75} />
                 </span>
@@ -139,31 +141,9 @@ function AppShell({ children }) {
             onClick={handleLogout}
             aria-label="Logout"
             title="Logout"
-            style={{
-              marginTop: "8px",
-              width: "100%",
-              padding: "8px 12px",
-              background: "rgba(239, 68, 68, 0.1)",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
-              borderRadius: "6px",
-              color: "#ef4444",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              fontSize: "14px",
-              transition: "all 0.2s ease"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
-            }}
           >
             <LogOut size={16} />
-            <span>Logout</span>
+            {!isCollapsed && <span className="aegis-logout-label">Logout</span>}
           </button>
         </div>
       </aside>

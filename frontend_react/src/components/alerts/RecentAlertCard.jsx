@@ -3,7 +3,7 @@ import { SeverityBadge } from "../common";
 import "../../index.css";
 
 function RecentAlertCard({ id, title, severity = "Medium", time, source }) {
-  const sev = severity.toLowerCase();
+  const sev = severity.toLowerCase().trim();
 
   return (
     <div className={`aegis-alert-card aegis-alert-card--${sev}`}>

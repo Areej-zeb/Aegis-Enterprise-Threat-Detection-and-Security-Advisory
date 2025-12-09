@@ -27,9 +27,17 @@ import {
   getExplanation,
   checkHealth
 } from "../api/aegisClient.ts";
-import AlertFrequencyChart from "../components/charts/AlertFrequencyChart.tsx";
+import RecentAlertTrends from "../components/RecentAlertTrends.tsx";
+import ExplainabilityPanel from "../components/ids/ExplainabilityPanel.tsx";
 import MetricsSummaryCard from "../components/cards/MetricsSummaryCard.tsx";
 import { SeverityBadge } from "../components/common";
+import { useIdsAnalytics } from "../hooks/useIdsAnalytics.ts";
+import { IdsAnalyticsKpiRow } from "../components/ids/analytics/IdsAnalyticsKpiRow.tsx";
+import { AlertsOverTimeChart } from "../components/ids/analytics/AlertsOverTimeChart.tsx";
+import { AttackTypeDistribution } from "../components/ids/analytics/AttackTypeDistribution.tsx";
+import { SeverityBreakdownChart } from "../components/ids/analytics/SeverityBreakdownChart.tsx";
+import { TopTalkersTable } from "../components/ids/analytics/TopTalkersTable.tsx";
+import { TimeRangeSelector } from "../components/ids/analytics/TimeRangeSelector.tsx";
 
 // --- Demo data (fallback for when API is unavailable) ----------------------
 
@@ -95,10 +103,177 @@ const mockAlerts = [
 const tabs = [
   { id: "overview", label: "Overview", icon: ChartPie },
   { id: "live-alerts", label: "Live Alerts", icon: Activity },
-  { id: "explainability", label: "Explainability", icon: BrainCircuit },
   { id: "analytics", label: "Analytics", icon: LineChart },
   { id: "threat-intel", label: "Threat Intel", icon: ShieldAlert },
 ];
+
+// Analytics Tab Content Component
+function AnalyticsTabContent({ alerts, loading, error }) {
+  const [timeRange, setTimeRange] = React.useState("1h");
+
+  // Convert alerts to IdsAlert format
+  const idsAlerts = React.useMemo(() => {
+    return alerts.map(alert => ({
+      id: alert.id || alert.detection_id || "",
+      timestamp: alert.timestamp || new Date().toISOString(),
+      attackType: alert.attack_type || alert.label || alert.attackType || "UNKNOWN",
+      label: alert.label || alert.attack_type,
+      severity: (alert.severity || "low"),
+      score: alert.score || alert.confidence || 0,
+      sourceIp: alert.source_ip || alert.src_ip || alert.srcIp || "",
+      destIp: alert.destination_ip || alert.dst_ip || alert.destIp || "",
+      protocol: alert.protocol || alert.proto || "",
+      model: alert.model || alert.model_type || alert.sensor || "",
+      model_type: alert.model_type || alert.model,
+    }));
+  }, [alerts]);
+
+  const minutesWindow = timeRange === "15m" ? 15 : timeRange === "1h" ? 60 : 24 * 60;
+  const analytics = useIdsAnalytics(idsAlerts, { minutesWindow, bucketSizeMinutes: 5 });
+
+  if (loading) {
+    return (
+      <section className="ids-analytics-grid">
+        <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: '#666' }}>
+          <RefreshCcw size={32} style={{ animation: 'spin 1s linear infinite', marginBottom: '1rem' }} />
+          <p>Loading analytics data...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="ids-analytics-grid">
+        <div style={{ gridColumn: '1 / -1', padding: '2rem', textAlign: 'center', color: '#f44' }}>
+          <p>Error loading analytics: {error}</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (idsAlerts.length === 0) {
+    return (
+      <section className="ids-analytics-grid">
+        <div style={{ gridColumn: '1 / -1', padding: '2rem', textAlign: 'center', color: '#999' }}>
+          <p>No alerts available in the selected time window.</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="ids-analytics-grid" style={{ padding: '1.5rem' }}>
+      {/* Header with Time Range Selector */}
+      <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>Analytics</h1>
+          <p style={{ fontSize: '0.875rem', color: '#94a3b8' }}>Real-time intelligence from IDS alerts</p>
+        </div>
+        <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
+      </div>
+
+      {/* KPI Row */}
+      <IdsAnalyticsKpiRow
+        totalAlerts={analytics.totalAlerts}
+        detectionRate={analytics.detectionRate}
+        highCriticalCount={analytics.highSeverityCount + analytics.criticalSeverityCount}
+        uniqueSources={analytics.topSources.length}
+      />
+
+      {/* Row 2: Volume & Mix */}
+      <div style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+        {/* Alerts Over Time */}
+        <div className="aegis-card">
+          <div className="aegis-card-header">
+            <h2>Alerts Over Time</h2>
+            <span className="aegis-card-subtitle">
+              Stacked by severity (last {timeRange})
+            </span>
+          </div>
+          <AlertsOverTimeChart data={analytics.alertsOverTime} />
+        </div>
+
+        {/* Attack Type Distribution */}
+        <div className="aegis-card">
+          <div className="aegis-card-header">
+            <h2>Attack Type Distribution</h2>
+            <span className="aegis-card-subtitle">
+              Share of detections by attack type
+            </span>
+          </div>
+          <AttackTypeDistribution attackCounts={analytics.attackCounts} />
+        </div>
+      </div>
+
+      {/* Row 3: Severity & Top Talkers */}
+      <div style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+        {/* Severity Breakdown */}
+        <div className="aegis-card">
+          <div className="aegis-card-header">
+            <h2>Severity Breakdown</h2>
+            <span className="aegis-card-subtitle">
+              Alert distribution by severity level
+            </span>
+          </div>
+          <SeverityBreakdownChart severityCounts={analytics.severityCounts} />
+        </div>
+
+        {/* Top Talkers */}
+        <div className="aegis-card">
+          <div className="aegis-card-header">
+            <h2>Top Talkers</h2>
+            <span className="aegis-card-subtitle">
+              Most active source IPs
+            </span>
+          </div>
+          <TopTalkersTable topSources={analytics.topSources} />
+        </div>
+      </div>
+
+      {/* Row 4: Model Overview (if available) */}
+      {analytics.modelCounts.length > 0 && (
+        <div style={{ gridColumn: '1 / -1' }}>
+          <div className="aegis-card">
+            <div className="aegis-card-header">
+              <h2>Detections by Model</h2>
+              <span className="aegis-card-subtitle">
+                Alert distribution across ML models
+              </span>
+            </div>
+            <div className="ids-table-wrapper">
+              <table className="ids-table">
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th>Count</th>
+                    <th>Percentage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analytics.modelCounts.map((item, index) => {
+                    const percentage = analytics.totalAlerts > 0 
+                      ? ((item.count / analytics.totalAlerts) * 100).toFixed(1)
+                      : "0.0";
+                    return (
+                      <tr key={item.model || index}>
+                        <td style={{ textTransform: 'capitalize' }}>
+                          {item.model.replace(/_/g, ' ')}
+                        </td>
+                        <td>{item.count}</td>
+                        <td>{percentage}%</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
 
 function IDSPage() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -117,11 +292,6 @@ function IDSPage() {
   const [error, setError] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Explainability state
-  const [detectionIdInput, setDetectionIdInput] = useState("");
-  const [explanation, setExplanation] = useState(null);
-  const [explanationLoading, setExplanationLoading] = useState(false);
-  const [explanationError, setExplanationError] = useState(null);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Load Overview data
@@ -243,32 +413,6 @@ function IDSPage() {
     return () => clearInterval(interval);
   }, [activeTab, autoRefresh, severityFilter]);
 
-  // Handle explanation lookup
-  async function handleGetExplanation() {
-    if (!detectionIdInput.trim()) {
-      setExplanationError("Please enter a detection ID");
-      return;
-    }
-
-    try {
-      setExplanationLoading(true);
-      setExplanationError(null);
-
-      const result = await getExplanation(detectionIdInput.trim());
-      setExplanation(result);
-    } catch (err) {
-      if (err.message.includes("EXPLANATION_NOT_AVAILABLE")) {
-        setExplanationError("Explanation not yet available for this detection");
-      } else if (err.message.includes("DETECTION_NOT_FOUND")) {
-        setExplanationError("Detection ID not found");
-      } else {
-        setExplanationError(err.message);
-      }
-      setExplanation(null);
-    } finally {
-      setExplanationLoading(false);
-    }
-  }
 
   // Compute Security Overview metrics from a single source of truth
   // Prefer alerts array if available, otherwise use metrics.severity_counts
@@ -618,6 +762,17 @@ function IDSPage() {
 
           {/* Right column: Distributions */}
           <div className="ids-overview-right">
+            {/* Recent Alert Trends */}
+            <div className="aegis-card" style={{ minHeight: "400px" }}>
+              <div className="aegis-card-header">
+                <h2>Recent Alert Trends (Last 50 Alerts)</h2>
+                <span className="aegis-card-subtitle">
+                  Severity distribution across the most recent alerts
+                </span>
+              </div>
+              <RecentAlertTrends alerts={alerts} />
+            </div>
+
             <div className="aegis-card">
               <div className="aegis-card-header">
                 <h2>Distributions</h2>
@@ -942,13 +1097,6 @@ function IDSPage() {
                 )}
               </div>
 
-              {/* Frequency chart */}
-              <div className="aegis-card" style={{ padding: '16px' }}>
-                <div className="aegis-card-header" style={{ marginBottom: '12px' }}>
-                  <h3 style={{ margin: 0, fontSize: '14px' }}>Alert Frequency (Last 60s)</h3>
-                </div>
-                <AlertFrequencyChart alerts={alerts} timeWindowSeconds={60} />
-              </div>
             </div>
           </div>
 
@@ -1068,6 +1216,9 @@ function IDSPage() {
               </div>
             </div>
 
+            {/* Explainability Panel */}
+            <ExplainabilityPanel detectionId={selectedAlert?.id || null} />
+
             {/* AI Advisory Insight */}
             <div className="aegis-card ids-advisory-card">
               <div className="ids-advisory-header">
@@ -1103,252 +1254,8 @@ function IDSPage() {
         </section>
       )}
 
-      {/* Explainability Tab */}
-      {activeTab === "explainability" && (
-        <section className="ids-explain-grid">
-          {/* Detection Lookup */}
-          <div className="aegis-card">
-            <div className="aegis-card-header">
-              <h2>Explain Detection</h2>
-              <span className="aegis-card-subtitle">
-                Enter a detection ID to view SHAP feature importance
-              </span>
-            </div>
-            <div className="ids-explain-content">
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                <input
-                  type="text"
-                  value={detectionIdInput}
-                  onChange={(e) => setDetectionIdInput(e.target.value)}
-                  placeholder="Enter Detection ID (e.g., det_12345)"
-                  className="ids-search-input"
-                  style={{ flex: 1 }}
-                />
-                <button
-                  className="ids-pentest-btn"
-                  onClick={handleGetExplanation}
-                  disabled={explanationLoading}
-                >
-                  {explanationLoading ? "Analyzing..." : "Get Explanation"}
-                </button>
-              </div>
-
-              {explanationError && (
-                <div style={{ padding: '1rem', background: '#fee', color: '#c00', borderRadius: '8px', marginBottom: '1rem' }}>
-                  {explanationError}
-                </div>
-              )}
-
-              {!explanation && !explanationLoading && !explanationError && (
-                <p className="ids-explain-note">
-                  Aegis IDS uses SHAP values to quantify how each traffic feature
-                  pushes a prediction towards benign or malicious.
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Explanation Result */}
-          {explanation && (
-            <>
-              <div className="aegis-card">
-                <div className="aegis-card-header">
-                  <h2>Feature Importance (SHAP Values)</h2>
-                  <span className="aegis-card-subtitle">
-                    Detection ID: {explanation.detection_id}
-                  </span>
-                </div>
-                <div className="ids-feature-list">
-                  {explanation.feature_importance ? (
-                    Object.entries(explanation.feature_importance)
-                      .sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))
-                      .map(([name, value]) => (
-                        <div key={name} className="ids-feature-row">
-                          <div className="ids-feature-main">
-                            <div className="ids-feature-name">{name}</div>
-                            <div className="ids-feature-desc">Feature contribution</div>
-                          </div>
-                          <div className="ids-feature-shap">
-                            <div className="ids-bar">
-                              <div
-                                className={`ids-bar-fill ${value > 0 ? 'ids-bar-fill--purple' : 'ids-bar-fill--green'}`}
-                                style={{
-                                  width: `${Math.min(100, Math.abs(value) * 100 + 10)}%`,
-                                }}
-                              />
-                            </div>
-                            <span className="ids-bar-value">{value.toFixed(4)}</span>
-                          </div>
-                        </div>
-                      ))
-                  ) : (
-                    <p style={{ padding: '1rem', color: '#888' }}>No feature importance data available.</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="aegis-card ids-explain-example">
-                <div className="aegis-card-header">
-                  <h2>Explanation Narrative</h2>
-                </div>
-                <div className="ids-explain-content">
-                  <p>{explanation.explanation}</p>
-                  {explanation.model_used && (
-                    <p style={{ marginTop: '1rem', fontSize: '0.85rem', color: '#666' }}>
-                      <strong>Model Used:</strong> {explanation.model_used}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-        </section>
-      )}
-
       {/* Analytics Tab */}
-      {activeTab === "analytics" && (
-        <section className="ids-analytics-grid">
-          {loading && !initialLoadComplete ? (
-            <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: '#666' }}>
-              <RefreshCcw size={32} style={{ animation: 'spin 1s linear infinite', marginBottom: '1rem' }} />
-              <p>Loading analytics data from ML models...</p>
-            </div>
-          ) : error ? (
-            <div style={{ gridColumn: '1 / -1', padding: '2rem', textAlign: 'center', color: '#f44' }}>
-              <p>Error loading analytics: {error}</p>
-              <button onClick={handleDashboardRefresh} style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>
-                Retry
-              </button>
-            </div>
-          ) : !metrics ? (
-            <div style={{ gridColumn: '1 / -1', padding: '2rem', textAlign: 'center', color: '#999' }}>
-              <p>No analytics data available. Click refresh to load data from ML models.</p>
-              <button onClick={handleDashboardRefresh} style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>
-                Refresh Data
-              </button>
-            </div>
-          ) : (
-            <>
-          {/* Metrics Summary */}
-          <MetricsSummaryCard
-            title="Metrics Summary"
-            subtitle="Overview of system activity"
-            metrics={[
-              {
-                id: 'total-detections',
-                label: 'Total Detections',
-                value: metrics?.total_detections || 0,
-                emphasis: 'normal'
-              },
-              {
-                id: 'total-alerts',
-                label: 'Total Alerts',
-                value: metrics?.total_alerts || 0,
-                emphasis: 'normal'
-              },
-              {
-                id: 'detection-rate',
-                label: 'Detection Rate',
-                value: metrics?.detection_rate ? `${(metrics.detection_rate * 100).toFixed(1)}%` : 'N/A',
-                emphasis: 'primary'
-              },
-              {
-                id: 'total-flows',
-                label: 'Total Flows',
-                value: metrics?.total_flows?.toLocaleString() || 0,
-                emphasis: 'normal'
-              },
-              {
-                id: 'high-severity',
-                label: 'High Severity',
-                value: metrics?.severity_counts?.high || 0,
-                emphasis: 'danger'
-              },
-              {
-                id: 'medium-severity',
-                label: 'Medium Severity',
-                value: metrics?.severity_counts?.medium || 0,
-                emphasis: 'warning'
-              }
-            ]}
-          />
-
-          {/* Attack Counts */}
-          <div className="aegis-card">
-            <div className="aegis-card-header">
-              <h2>Attack Counts</h2>
-              <span className="aegis-card-subtitle">
-                Total detections by attack type
-              </span>
-            </div>
-            <div className="ids-table-wrapper">
-              <table className="ids-table">
-                <thead>
-                  <tr>
-                    <th>Attack Type</th>
-                    <th>Count</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {metrics?.attack_counts ? (
-                    Object.entries(metrics.attack_counts)
-                      .sort(([, a], [, b]) => b - a)
-                      .map(([type, count]) => (
-                        <tr key={type}>
-                          <td style={{ textTransform: 'capitalize' }}>{type.replace(/_/g, ' ')}</td>
-                          <td>{count}</td>
-                        </tr>
-                      ))
-                  ) : (
-                    <tr>
-                      <td colSpan={2} style={{ textAlign: 'center', color: '#888' }}>No data available</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Severity Counts */}
-          <div className="aegis-card">
-            <div className="aegis-card-header">
-              <h2>Severity Counts</h2>
-              <span className="aegis-card-subtitle">
-                Total detections by severity
-              </span>
-            </div>
-            <div className="ids-table-wrapper">
-              <table className="ids-table">
-                <thead>
-                  <tr>
-                    <th>Severity</th>
-                    <th>Count</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {metrics?.severity_counts ? (
-                    Object.entries(metrics.severity_counts)
-                      .sort(([, a], [, b]) => b - a)
-                      .map(([severity, count]) => (
-                        <tr key={severity}>
-                          <td><SeverityBadge severity={severity} /></td>
-                          <td>{count}</td>
-                        </tr>
-                      ))
-                  ) : (
-                    <tr>
-                      <td colSpan={2} style={{ textAlign: 'center', color: '#888' }}>No data available</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-            </>
-          )}
-        </section>
-      )}
+      {activeTab === "analytics" && <AnalyticsTabContent alerts={alerts} loading={loading} error={error} />}
 
       {/* Threat Intel Tab */}
       {activeTab === "threat-intel" && (

@@ -3,7 +3,7 @@
  * Handles login, registration, and token management
  */
 
-const API_BASE_URL = import.meta.env.VITE_AUTH_API_BASE_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_AUTH_API_BASE_URL || 'http://localhost:5000';
 
 class AuthService {
   constructor() {
@@ -14,14 +14,14 @@ class AuthService {
   /**
    * Register a new user
    */
-  async register(email, password) {
+  async register(name, email, password) {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await response.json();
@@ -55,7 +55,7 @@ class AuthService {
    */
   async login(email, password) {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

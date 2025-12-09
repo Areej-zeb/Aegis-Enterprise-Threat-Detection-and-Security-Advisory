@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import "../index.css";
 import { AlertTriangle, RefreshCcw, Search, RotateCw, Circle, Wifi, WifiOff, Skull } from "lucide-react";
 import { fetchAlerts, checkHealth, fetchLiveDetections } from "../api/aegisClient.ts";
-import AlertFrequencyChart from "../components/charts/AlertFrequencyChart.tsx";
+import RecentAlertTrends from "../components/RecentAlertTrends.tsx";
 import { ErrorAlert } from "../components/common";
 import { useWebSocketAlerts } from "../hooks/useWebSocketAlerts.ts";
 import { AlertToast } from "../components/alerts/AlertToast.tsx";
@@ -422,12 +422,12 @@ function LiveAlertsPage() {
 
       <div className="aegis-card" style={{ marginTop: '20px' }}>
         <div className="aegis-card-header">
-          <h2>Alert Frequency (Last 60s)</h2>
+          <h2>Recent Alert Trends (Last 50 Alerts)</h2>
           <span className="aegis-card-subtitle">
-            Real-time alert distribution by severity
+            Severity distribution across the most recent alerts
           </span>
         </div>
-        <AlertFrequencyChart alerts={alerts} timeWindowSeconds={60} />
+        <RecentAlertTrends alerts={alerts} />
       </div>
     </div>
     </>
