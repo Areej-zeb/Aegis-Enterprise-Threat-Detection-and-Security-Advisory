@@ -1,103 +1,53 @@
-# Python# ==============================================================================
+# ==============================================================================
+# Aegis IDS - Comprehensive .gitignore
+# ==============================================================================
 
-__pycache__/# Aegis IDS - Comprehensive .gitignore
-
-*.py[cod]# ==============================================================================
-
+# Python
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
 *$py.class
-
-*.so# Python
-
-.Python# ------------------------------------------------------------------------------
-
-build/__pycache__/
-
-dist/*.py[cod]
-
-*.egg-info/*$py.class
-
-pip-log.txt*.so
-
+*.so
 .Python
-
-# Virtual Environmentsbuild/
-venv/
-
-.venv/develop-eggs/
-
-venv/dist/
-
-env/downloads/
-
-ENV/eggs/
-
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
 .eggs/
-
-# Environment Variableslib/
-
-.envlib64/
-
-.env.localparts/
-
-*.envsdist/
-
-!.env.examplevar/
-
+lib/
+lib64/
+parts/
+sdist/
+var/
 wheels/
-
-# Testingshare/python-wheels/
-
-.pytest_cache/*.egg-info/
-
-.coverage.installed.cfg
-
-htmlcov/*.egg
-
-*.logMANIFEST
-
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 pip-log.txt
+pip-delete-this-directory.txt
 
-# IDEspip-delete-this-directory.txt
-
-.vscode/
-
-.idea/# Virtual Environments
-
-*.swp# ------------------------------------------------------------------------------
-
-*~venv/
-
+# Virtual Environments
+# ------------------------------------------------------------------------------
+venv/
 env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
 
-# OSENV/
+# Environment Variables
+# ------------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
 
-.DS_Store.venv/
-
-Thumbs.dbenv.bak/
-
-*.bakvenv.bak/
-
-
-
-# ML/Data# Environment Variables
-
-*.h5# ------------------------------------------------------------------------------
-
-*.pkl.env
-
-*.pickle.env.local
-
-artifacts/*.joblib.env.*.local
-
-!artifacts/xgb_baseline.joblib*.env
-
-datasets/raw/!.env.example
-
-datasets/processed/
-
-*.csv# Testing & Coverage
-
-*.parquet# ------------------------------------------------------------------------------
+# Testing & Coverage
+# ------------------------------------------------------------------------------
 
 !datasets/index.yamlhtmlcov/
 
@@ -184,7 +134,7 @@ $RECYCLE.BIN/
 .Trash-*
 .nfs*
 
-# Node.js (for future React frontend)
+# Node.js (for React frontend)
 # ------------------------------------------------------------------------------
 node_modules/
 npm-debug.log*
@@ -202,8 +152,8 @@ yarn.lock
 
 # Frontend builds
 # ------------------------------------------------------------------------------
-frontend-react/build/
-frontend-react/dist/
+frontend_react/build/
+frontend_react/dist/
 *.local
 
 # ML/Data Science
@@ -226,10 +176,15 @@ mlruns/
 wandb/
 .wandb/
 
+# Overfitting Analysis
+# ------------------------------------------------------------------------------
+overfitting_analysis/
+
 # Data files
 # ------------------------------------------------------------------------------
 datasets/raw/
 datasets/processed/
+processed/
 *.csv
 *.parquet
 *.feather
