@@ -1,0 +1,556 @@
+/*
+ * Windows 11 Dark UI - Utility Classes
+ * Apply consistent Windows 11 aesthetics across all components
+ */
+
+/* ================================
+   SURFACE UTILITIES
+   ================================ */
+
+/* Main window surface - dark matte, no gradients */
+.win-surface {
+  background-color: var(--win-surface-default);
+  color: var(--win-text-primary);
+}
+
+/* Elevated panel surface (titlebar, menus) */
+.win-panel {
+  background-color: var(--win-bg-layer-3);
+  color: var(--win-text-primary);
+}
+
+/* Card surface for list items, tiles */
+.win-card {
+  background-color: var(--win-surface-card);
+  color: var(--win-text-primary);
+}
+
+/* Input surface for text fields */
+.win-input-surface {
+  background-color: var(--win-surface-input);
+  color: var(--win-text-primary);
+}
+
+/* Overlay surface with backdrop blur (start menu, modals) */
+.win-overlay {
+  background: linear-gradient(to bottom right, rgba(20, 21, 26, 0.94), rgba(10, 11, 14, 0.96));
+  backdrop-filter: blur(var(--win-blur-md));
+  -webkit-backdrop-filter: blur(var(--win-blur-md));
+}
+
+/* ================================
+   BORDER UTILITIES
+   ================================ */
+
+/* Subtle border - dividers, separators */
+.win-border {
+  border: 1px solid var(--win-border-default);
+}
+
+.win-border-subtle {
+  border: 1px solid var(--win-border-subtle);
+}
+
+.win-border-strong {
+  border: 1px solid var(--win-border-strong);
+}
+
+/* Border on specific sides */
+.win-border-t {
+  border-top: 1px solid var(--win-border-default);
+}
+.win-border-b {
+  border-bottom: 1px solid var(--win-border-default);
+}
+.win-border-l {
+  border-left: 1px solid var(--win-border-default);
+}
+.win-border-r {
+  border-right: 1px solid var(--win-border-default);
+}
+
+/* Divider line - horizontal separator */
+.win-divider {
+  height: 1px;
+  background-color: var(--win-border-default);
+}
+
+.win-divider-subtle {
+  height: 1px;
+  background-color: var(--win-border-subtle);
+}
+
+/* ================================
+   SHADOW UTILITIES
+   ================================ */
+
+/* Window shadow - large, soft for main windows */
+.win-shadow {
+  box-shadow: var(--win-shadow-window);
+}
+
+.win-shadow-active {
+  box-shadow: var(--win-shadow-window-active);
+}
+
+/* Panel shadow - for menus, dropdowns */
+.win-shadow-panel {
+  box-shadow: var(--win-shadow-panel);
+}
+
+/* Hover shadow - subtle elevation */
+.win-shadow-hover {
+  box-shadow: var(--win-shadow-hover);
+}
+
+/* Popup shadow - tooltips, context menus */
+.win-shadow-popup {
+  box-shadow: var(--win-shadow-popup);
+}
+
+/* ================================
+   FOCUS RING UTILITIES
+   ================================ */
+
+/* Standard focus ring - Windows 11 style */
+.win-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--win-accent-subtle);
+  border-color: var(--win-accent-border);
+}
+
+/* Focus ring for dark backgrounds */
+.win-focus-ring-light:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+/* Accent focus ring for inputs */
+.win-focus-accent:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--win-accent-primary), 0 0 0 3px var(--win-accent-subtle);
+}
+
+/* ================================
+   INTERACTIVE STATE UTILITIES
+   ================================ */
+
+/* Hover states */
+.win-hover {
+  transition: background-color var(--win-transition-fast);
+}
+
+.win-hover:hover {
+  background-color: var(--win-hover-medium);
+}
+
+.win-hover-light:hover {
+  background-color: var(--win-hover-light);
+}
+
+.win-hover-strong:hover {
+  background-color: var(--win-hover-strong);
+}
+
+/* Active/pressed state */
+.win-active:active {
+  background-color: var(--win-active);
+}
+
+/* Selected state */
+.win-selected {
+  background-color: var(--win-selected);
+}
+
+/* ================================
+   RADIUS UTILITIES
+   ================================ */
+
+.win-rounded-xs {
+  border-radius: var(--win-radius-xs);
+}
+.win-rounded-sm {
+  border-radius: var(--win-radius-sm);
+}
+.win-rounded-md {
+  border-radius: var(--win-radius-md);
+}
+.win-rounded-lg {
+  border-radius: var(--win-radius-lg);
+}
+.win-rounded-xl {
+  border-radius: var(--win-radius-xl);
+}
+.win-rounded-2xl {
+  border-radius: var(--win-radius-2xl);
+}
+.win-rounded-full {
+  border-radius: var(--win-radius-full);
+}
+
+/* ================================
+   TYPOGRAPHY UTILITIES
+   ================================ */
+
+/* Text colors */
+.win-text {
+  color: var(--win-text-primary);
+}
+.win-text-secondary {
+  color: var(--win-text-secondary);
+}
+.win-text-tertiary {
+  color: var(--win-text-tertiary);
+}
+.win-text-muted {
+  color: var(--win-text-placeholder);
+}
+.win-text-disabled {
+  color: var(--win-text-disabled);
+}
+.win-text-accent {
+  color: var(--win-accent-primary);
+}
+
+/* Font sizes */
+.win-text-xs {
+  font-size: var(--win-text-xs);
+}
+.win-text-sm {
+  font-size: var(--win-text-sm);
+}
+.win-text-base {
+  font-size: var(--win-text-base);
+}
+.win-text-md {
+  font-size: var(--win-text-md);
+}
+.win-text-lg {
+  font-size: var(--win-text-lg);
+}
+.win-text-xl {
+  font-size: var(--win-text-xl);
+}
+.win-text-2xl {
+  font-size: var(--win-text-2xl);
+}
+.win-text-3xl {
+  font-size: var(--win-text-3xl);
+}
+
+/* Font weights */
+.win-font-light {
+  font-weight: var(--win-font-light);
+}
+.win-font-normal {
+  font-weight: var(--win-font-normal);
+}
+.win-font-medium {
+  font-weight: var(--win-font-medium);
+}
+.win-font-semibold {
+  font-weight: var(--win-font-semibold);
+}
+.win-font-bold {
+  font-weight: var(--win-font-bold);
+}
+
+/* ================================
+   SCROLLBAR STYLING
+   ================================ */
+
+/* Windows 11 style scrollbar */
+.win-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.win-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.win-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.win-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.win-scrollbar::-webkit-scrollbar-thumb:active {
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Thin scrollbar variant */
+.win-scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Auto-hide scrollbar on idle */
+.win-scrollbar-auto {
+  scrollbar-gutter: stable;
+}
+
+.win-scrollbar-auto::-webkit-scrollbar-thumb {
+  background: transparent;
+  transition: background var(--win-transition-slow);
+}
+
+.win-scrollbar-auto:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ================================
+   WINDOW COMPONENT CLASSES
+   ================================ */
+
+/* Complete window styling */
+.win-window {
+  background-color: var(--win-surface-default);
+  border: 1px solid var(--win-border-default);
+  border-radius: var(--win-radius-lg);
+  box-shadow: var(--win-shadow-window);
+  overflow: hidden;
+}
+
+.win-window-active {
+  box-shadow: var(--win-shadow-window-active);
+  border-color: var(--win-border-strong);
+}
+
+/* Window titlebar */
+.win-titlebar {
+  background-color: var(--win-bg-layer-3);
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
+.win-titlebar-active {
+  background-color: var(--win-bg-layer-4);
+}
+
+/* Window content area */
+.win-content {
+  background-color: var(--win-bg-layer-1);
+  flex: 1;
+  overflow: auto;
+}
+
+/* ================================
+   BUTTON COMPONENT CLASSES
+   ================================ */
+
+/* Standard button */
+.win-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  font-size: var(--win-text-sm);
+  font-weight: var(--win-font-normal);
+  color: var(--win-text-primary);
+  background-color: var(--win-hover-medium);
+  border: 1px solid var(--win-border-default);
+  border-radius: var(--win-radius-sm);
+  cursor: pointer;
+  transition: all var(--win-transition-fast);
+}
+
+.win-button:hover {
+  background-color: var(--win-hover-strong);
+  border-color: var(--win-border-strong);
+}
+
+.win-button:active {
+  background-color: var(--win-active);
+}
+
+.win-button:focus-visible {
+  outline: none;
+  box-shadow: var(--win-shadow-focus);
+}
+
+/* Accent button */
+.win-button-accent {
+  background-color: var(--win-accent-primary);
+  color: #000;
+  border-color: var(--win-accent-primary);
+}
+
+.win-button-accent:hover {
+  background-color: var(--win-accent-hover);
+  border-color: var(--win-accent-hover);
+}
+
+/* ================================
+   INPUT COMPONENT CLASSES
+   ================================ */
+
+/* Text input */
+.win-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: var(--win-text-sm);
+  color: var(--win-text-primary);
+  background-color: var(--win-surface-input);
+  border: 1px solid var(--win-border-default);
+  border-radius: var(--win-radius-sm);
+  transition: all var(--win-transition-fast);
+}
+
+.win-input::placeholder {
+  color: var(--win-text-placeholder);
+}
+
+.win-input:hover {
+  border-color: var(--win-border-strong);
+}
+
+.win-input:focus {
+  outline: none;
+  border-color: var(--win-accent-primary);
+  box-shadow: 0 0 0 1px var(--win-accent-subtle);
+}
+
+/* ================================
+   MENU COMPONENT CLASSES
+   ================================ */
+
+/* Menu container */
+.win-menu {
+  background: linear-gradient(to bottom right, rgba(20, 21, 26, 0.94), rgba(10, 11, 14, 0.96));
+  backdrop-filter: blur(var(--win-blur-md));
+  -webkit-backdrop-filter: blur(var(--win-blur-md));
+  border: 1px solid var(--win-border-default);
+  border-radius: var(--win-radius-xl);
+  box-shadow: var(--win-shadow-popup);
+  overflow: hidden;
+}
+
+/* Menu item */
+.win-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: var(--win-text-sm);
+  color: var(--win-text-primary);
+  cursor: pointer;
+  transition: background-color var(--win-transition-fast);
+}
+
+.win-menu-item:hover {
+  background-color: var(--win-hover-medium);
+}
+
+.win-menu-item:active {
+  background-color: var(--win-active);
+}
+
+/* ================================
+   TASKBAR CLASSES
+   ================================ */
+
+.win-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background-color: rgba(20, 20, 20, 0.85);
+  border-top: 1px solid var(--win-border-subtle);
+  backdrop-filter: blur(var(--win-blur-sm));
+  -webkit-backdrop-filter: blur(var(--win-blur-sm));
+  display: flex;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Taskbar button */
+.win-taskbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  min-width: 44px;
+  padding: 0 12px;
+  color: var(--win-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--win-radius-sm);
+  cursor: pointer;
+  transition: all var(--win-transition-fast);
+}
+
+.win-taskbar-button:hover {
+  background-color: var(--win-hover-medium);
+  color: var(--win-text-primary);
+}
+
+.win-taskbar-button-active {
+  background-color: var(--win-hover-strong);
+  color: var(--win-text-primary);
+}
+
+/* ================================
+   ANIMATION UTILITIES
+   ================================ */
+
+/* Fade in */
+@keyframes win-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.win-animate-fade-in {
+  animation: win-fade-in var(--win-transition-slow) ease-out;
+}
+
+/* Slide up */
+@keyframes win-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.win-animate-slide-up {
+  animation: win-slide-up var(--win-transition-slow) ease-out;
+}
+
+/* Scale in */
+@keyframes win-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.win-animate-scale-in {
+  animation: win-scale-in var(--win-transition-slow) ease-out;
+}
