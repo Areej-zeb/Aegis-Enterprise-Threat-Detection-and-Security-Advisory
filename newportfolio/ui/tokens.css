@@ -1,0 +1,155 @@
+/*
+ * Windows 11 Dark UI Design System - Tokens
+ * All design tokens for the OS-like portfolio
+ */
+
+:root {
+  /* ================================
+     COLOR TOKENS - Background Layers
+     ================================ */
+  --win-bg-base: #0a0a0a; /* Deepest background (desktop) */
+  --win-bg-layer-1: #141414; /* Primary surface (window body) */
+  --win-bg-layer-2: #1c1c1c; /* Secondary surface (panels, cards) */
+  --win-bg-layer-3: #242424; /* Elevated surface (titlebar, menus) */
+  --win-bg-layer-4: #2c2c2c; /* Highest elevation (dropdowns, tooltips) */
+
+  /* Surface variants */
+  --win-surface-default: #1a1a1a; /* Default window/panel background */
+  --win-surface-card: #202020; /* Cards, list items */
+  --win-surface-input: #1e1e1e; /* Input fields, text areas */
+  --win-surface-overlay: rgba(0, 0, 0, 0.5); /* Modal/overlay backdrop */
+
+  /* ================================
+     COLOR TOKENS - Borders
+     ================================ */
+  --win-border-subtle: rgba(255, 255, 255, 0.06); /* Subtle dividers */
+  --win-border-default: rgba(255, 255, 255, 0.08); /* Default borders */
+  --win-border-strong: rgba(255, 255, 255, 0.12); /* Strong borders (active) */
+  --win-border-focused: rgba(255, 255, 255, 0.15); /* Focus state borders */
+
+  /* ================================
+     COLOR TOKENS - Text
+     ================================ */
+  --win-text-primary: rgba(255, 255, 255, 0.95); /* Primary text */
+  --win-text-secondary: rgba(255, 255, 255, 0.75); /* Secondary text */
+  --win-text-tertiary: rgba(255, 255, 255, 0.55); /* Muted/disabled text */
+  --win-text-placeholder: rgba(255, 255, 255, 0.35); /* Placeholder text */
+  --win-text-disabled: rgba(255, 255, 255, 0.25); /* Disabled text */
+
+  /* ================================
+     COLOR TOKENS - Accents
+     ================================ */
+  --win-accent-primary: #60cdff; /* Windows 11 blue accent */
+  --win-accent-hover: #7fd7ff; /* Accent hover state */
+  --win-accent-pressed: #4fc3ff; /* Accent pressed state */
+  --win-accent-subtle: rgba(96, 205, 255, 0.12); /* Subtle accent background */
+  --win-accent-border: rgba(96, 205, 255, 0.4); /* Accent border */
+
+  /* Semantic colors */
+  --win-danger: #ff6b6b; /* Destructive actions */
+  --win-danger-hover: #c42b1c; /* Close button hover */
+  --win-success: #6bcb77; /* Success states */
+  --win-warning: #ffd93d; /* Warning states */
+
+  /* ================================
+     COLOR TOKENS - Hover/Interactive
+     ================================ */
+  --win-hover-light: rgba(255, 255, 255, 0.06); /* Light hover overlay */
+  --win-hover-medium: rgba(255, 255, 255, 0.08); /* Medium hover overlay */
+  --win-hover-strong: rgba(255, 255, 255, 0.12); /* Strong hover overlay */
+  --win-active: rgba(255, 255, 255, 0.1); /* Active/pressed state */
+  --win-selected: rgba(255, 255, 255, 0.08); /* Selected item background */
+
+  /* ================================
+     RADIUS TOKENS
+     ================================ */
+  --win-radius-xs: 4px; /* Small elements (checkboxes, badges) */
+  --win-radius-sm: 6px; /* Buttons, inputs */
+  --win-radius-md: 8px; /* Cards, list items */
+  --win-radius-lg: 10px; /* Panels, dialogs */
+  --win-radius-xl: 12px; /* Windows, menus */
+  --win-radius-2xl: 16px; /* Overlays, modals */
+  --win-radius-full: 9999px; /* Pills, circular elements */
+
+  /* ================================
+     SHADOW TOKENS
+     ================================ */
+  /* Window shadows - large, diffused, creates depth */
+  --win-shadow-window: 0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.25), 0 24px 48px rgba(0, 0, 0, 0.35);
+
+  --win-shadow-window-active: 0 4px 8px rgba(0, 0, 0, 0.25), 0 16px 32px rgba(0, 0, 0, 0.35), 0 32px 64px
+    rgba(0, 0, 0, 0.45);
+
+  /* Panel shadows - medium, for menus and dropdowns */
+  --win-shadow-panel: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* Hover shadows - subtle elevation on hover */
+  --win-shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  /* Popup shadows - for tooltips, context menus */
+  --win-shadow-popup: 0 4px 16px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.4);
+
+  /* Inset shadow for pressed states */
+  --win-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+
+  /* Focus ring shadow */
+  --win-shadow-focus: 0 0 0 2px var(--win-accent-subtle);
+
+  /* ================================
+     BLUR TOKENS (Overlays only)
+     ================================ */
+  --win-blur-none: 0; /* No blur (windows) */
+  --win-blur-sm: 8px; /* Light blur */
+  --win-blur-md: 16px; /* Medium blur (start menu) */
+  --win-blur-lg: 24px; /* Heavy blur (overlays) */
+  --win-blur-xl: 32px; /* Maximum blur */
+
+  /* ================================
+     TYPOGRAPHY TOKENS
+     ================================ */
+  --win-font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --win-font-mono: "Cascadia Code", "Fira Code", "Consolas", monospace;
+
+  /* Font sizes */
+  --win-text-xs: 11px; /* Tiny labels */
+  --win-text-sm: 12px; /* Small text, captions */
+  --win-text-base: 13px; /* Body text (Windows default) */
+  --win-text-md: 14px; /* Slightly larger body */
+  --win-text-lg: 16px; /* Headings */
+  --win-text-xl: 18px; /* Section titles */
+  --win-text-2xl: 20px; /* Large titles */
+  --win-text-3xl: 24px; /* Dialog titles */
+
+  /* Font weights */
+  --win-font-light: 300;
+  --win-font-normal: 400;
+  --win-font-medium: 500;
+  --win-font-semibold: 600;
+  --win-font-bold: 700;
+
+  /* Line heights */
+  --win-leading-tight: 1.2;
+  --win-leading-normal: 1.4;
+  --win-leading-relaxed: 1.6;
+
+  /* ================================
+     SPACING TOKENS
+     ================================ */
+  --win-space-1: 4px;
+  --win-space-2: 8px;
+  --win-space-3: 12px;
+  --win-space-4: 16px;
+  --win-space-5: 20px;
+  --win-space-6: 24px;
+  --win-space-8: 32px;
+  --win-space-10: 40px;
+  --win-space-12: 48px;
+
+  /* ================================
+     TRANSITION TOKENS
+     ================================ */
+  --win-transition-fast: 100ms ease-out;
+  --win-transition-normal: 150ms ease-out;
+  --win-transition-slow: 200ms ease-out;
+  --win-transition-smooth: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
