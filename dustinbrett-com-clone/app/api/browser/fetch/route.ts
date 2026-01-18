@@ -238,6 +238,34 @@ export async function GET(request: NextRequest) {
     if (!["http:", "https:"].includes(parsedUrl.protocol)) {
       throw new Error("Invalid protocol")
     }
+
+    // SSRF Protection: Block localhost and private IPs
+    const hostname = parsedUrl.hostname.toLowerCase()
+    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1"
+    const isPrivateIP =
+      hostname.startsWith("192.168.") ||
+      hostname.startsWith("10.") ||
+      hostname.startsWith("172.16.") ||
+      hostname.startsWith("172.17.") ||
+      hostname.startsWith("172.18.") ||
+      hostname.startsWith("172.19.") ||
+      hostname.startsWith("172.20.") ||
+      hostname.startsWith("172.21.") ||
+      hostname.startsWith("172.22.") ||
+      hostname.startsWith("172.23.") ||
+      hostname.startsWith("172.24.") ||
+      hostname.startsWith("172.25.") ||
+      hostname.startsWith("172.26.") ||
+      hostname.startsWith("172.27.") ||
+      hostname.startsWith("172.28.") ||
+      hostname.startsWith("172.29.") ||
+      hostname.startsWith("172.30.") ||
+      hostname.startsWith("172.31.") ||
+      hostname === "0.0.0.0"
+
+    if (isLocalhost || isPrivateIP) {
+      return NextResponse.json({ error: "Access to localhost and private IPs is not allowed" }, { status: 403 })
+    }
   } catch {
     return NextResponse.json({ error: "Invalid URL" }, { status: 400 })
   }

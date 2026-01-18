@@ -36,6 +36,19 @@ interface Tab {
 
 const DEFAULT_HOME = "https://en.wikipedia.org"
 
+// Safe fetch helper for reader mode
+async function fetchReaderHtml(targetUrl: string) {
+  const endpoint = `/api/browser/fetch?url=${encodeURIComponent(targetUrl)}`
+  const res = await fetch(endpoint, { method: "GET" })
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "")
+    throw new Error(`Fetch failed: ${res.status} ${res.statusText} :: ${text}`)
+  }
+
+  return res.json() as Promise<{ title?: string; html?: string; finalUrl?: string; error?: string }>
+}
+
 export function Browser() {
   const [tabs, setTabs] = useState<Tab[]>([{ id: "1", url: "", title: "New Tab", mode: "iframe", loadState: "idle" }])
   const [activeTabId, setActiveTabId] = useState("1")
@@ -71,15 +84,19 @@ export function Browser() {
       updateTab(activeTab.id, { loadState: "loading", mode: "reader" })
 
       try {
-        const res = await fetch(`/api/browser/fetch?url=${encodeURIComponent(url)}`)
-        const data = await res.json()
+        // Use safe fetch helper - ensures absolute path and proper error handling
+        const data = await fetchReaderHtml(url)
 
-        if (!res.ok) {
-          throw new Error(data.error || "Failed to fetch")
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
+        if (!data.html) {
+          throw new Error("No HTML content received")
         }
 
         // Inject click handler script for internal navigation
-        const htmlWithHandler = injectLinkHandler(data.html, data.finalUrl)
+        const htmlWithHandler = injectLinkHandler(data.html, data.finalUrl || url)
 
         updateTab(activeTab.id, {
           loadState: "success",
