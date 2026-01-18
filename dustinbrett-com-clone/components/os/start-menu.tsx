@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState, forwardRef } from "react"
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle } from "react"
 import { useWindowStore } from "@/store/window-store"
 import { startMenuApps, apps, appCategories } from "@/lib/apps"
 import {
@@ -17,9 +17,14 @@ import {
 interface StartMenuProps {
   isOpen: boolean
   onClose: () => void
+  divRef?: React.RefObject<HTMLDivElement>
 }
 
-export const StartMenu = forwardRef<HTMLDivElement, StartMenuProps>(function StartMenu({ isOpen, onClose }, ref) {
+export interface StartMenuRef {
+  focusSearch: () => void
+}
+
+export const StartMenu = forwardRef<StartMenuRef, StartMenuProps>(function StartMenu({ isOpen, onClose, divRef }, ref) {
   const { openWindow } = useWindowStore()
 
   const rootRef = useRef<HTMLDivElement | null>(null)
@@ -140,6 +145,18 @@ export const StartMenu = forwardRef<HTMLDivElement, StartMenuProps>(function Sta
     [close, flatRows, handleOpenApp, selectedIndex]
   )
 
+  // Expose focusSearch method via ref
+  useImperativeHandle(ref, () => ({
+    focusSearch: () => {
+      if (isOpen) {
+        // Small delay to ensure the menu is fully rendered
+        setTimeout(() => {
+          searchRef.current?.focus()
+        }, 0)
+      }
+    },
+  }))
+
   // Focus menu on mount (so keyboard works instantly)
   useEffect(() => {
     if (isOpen) {
@@ -164,11 +181,22 @@ export const StartMenu = forwardRef<HTMLDivElement, StartMenuProps>(function Sta
     handleOpenApp("file-explorer")
   }, [handleOpenApp])
 
+  // Set both rootRef and divRef if provided
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      rootRef.current = node
+      if (divRef && "current" in divRef) {
+        ;(divRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+      }
+    },
+    [divRef]
+  )
+
   if (!isOpen) return null
 
   return (
     <div
-      ref={ref || rootRef}
+      ref={setRefs}
       tabIndex={0}
       onKeyDown={onKeyDown}
       onMouseMove={onMouseMove}

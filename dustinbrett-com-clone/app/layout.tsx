@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased overflow-hidden`}>
+      <body className={`${inter.variable} font-sans antialiased overflow-hidden`} suppressHydrationWarning>
         {children}
         <Analytics />
       </body>

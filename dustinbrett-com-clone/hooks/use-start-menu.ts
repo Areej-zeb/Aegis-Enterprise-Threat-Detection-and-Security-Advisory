@@ -24,17 +24,26 @@ export function useStartMenu() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [isOpen, close])
 
-  // Close on click outside
+  // Close on click outside (but not on mouse movement)
   useEffect(() => {
     if (!isOpen) return
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        // Check if click was on the start button (don't close if toggling)
-        const target = e.target as HTMLElement
-        if (target.closest("[data-start-button]")) return
-        close()
-      }
+      if (!menuRef.current) return
+      
+      const target = e.target as HTMLElement
+      
+      // Don't close if clicking inside the menu
+      if (menuRef.current.contains(target)) return
+      
+      // Don't close if clicking on the start button or search button
+      if (target.closest("[data-start-button]") || target.closest("[data-search-button]")) return
+      
+      // Don't close if clicking on the taskbar (menu is positioned above it)
+      if (target.closest("[data-taskbar]")) return
+      
+      // Only close on actual click, not on mouse movement
+      close()
     }
 
     // Small delay to prevent immediate close on open click

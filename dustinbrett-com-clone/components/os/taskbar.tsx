@@ -2,10 +2,10 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useWindowStore } from "@/store/window-store"
 import { useSystemSounds } from "@/hooks/use-system-sounds"
-import { StartMenu } from "./start-menu"
+import { StartMenu, type StartMenuRef } from "./start-menu"
 import { SystemTray } from "./system-tray"
 import { pinnedApps, apps } from "@/lib/apps"
 import { useStartMenu } from "@/hooks/use-start-menu"
@@ -83,6 +83,7 @@ export function Taskbar() {
   const { windows, activeWindowId, focusWindow, minimizeWindow, openWindow } = useWindowStore()
   const { isOpen: startMenuOpen, toggle: toggleStartMenu, close: closeStartMenu, menuRef } = useStartMenu()
   const { playClick } = useSystemSounds()
+  const startMenuRef = useRef<StartMenuRef>(null)
 
   const handleTaskbarItemClick = (windowId: string, isMinimized: boolean) => {
     playClick()
@@ -118,12 +119,13 @@ export function Taskbar() {
 
   return (
     <>
-      <StartMenu ref={menuRef} isOpen={startMenuOpen} onClose={closeStartMenu} />
+      <StartMenu ref={startMenuRef} divRef={menuRef} isOpen={startMenuOpen} onClose={closeStartMenu} />
 
-      <div className="fixed bottom-0 left-0 right-0 h-[46px] bg-[#1c1c1c]/92 backdrop-blur-xl border-t border-white/[0.06] flex items-center z-[9999]">
+      <div data-taskbar className="fixed bottom-0 left-0 right-0 h-[46px] bg-[#1c1c1c]/92 backdrop-blur-xl border-t border-white/[0.06] flex items-center z-[9999]">
         {/* Left section: Start button + Search + Pinned apps */}
         <div className="flex items-center h-full px-2 gap-0.5">
           <TaskbarIconButton
+            data-start-button
             onClick={() => {
               playClick()
               toggleStartMenu()
@@ -131,11 +133,27 @@ export function Taskbar() {
             label="Start"
             isActive={startMenuOpen}
           >
-            <StartIcon className="h-[18px] w-[18px] text-[#60cdff]" />
+            <StartIcon className="h-[20px] w-[20px] text-[#60cdff]" />
           </TaskbarIconButton>
 
-          <TaskbarIconButton onClick={() => playClick()} label="Search">
-            <Search className="h-[18px] w-[18px] text-white/80" strokeWidth={1.5} />
+          <TaskbarIconButton
+            data-search-button
+            onClick={() => {
+              playClick()
+              if (!startMenuOpen) {
+                toggleStartMenu()
+                // Focus search after menu opens
+                setTimeout(() => {
+                  startMenuRef.current?.focusSearch()
+                }, 50)
+              } else {
+                // If menu is already open, just focus search
+                startMenuRef.current?.focusSearch()
+              }
+            }}
+            label="Search"
+          >
+            <Search className="h-[20px] w-[20px] text-white/80" strokeWidth={1.5} />
           </TaskbarIconButton>
 
           {pinnedApps.map((app) => {
@@ -152,7 +170,7 @@ export function Taskbar() {
                 hasIndicator={hasOpenWindows}
                 dataWindowId={getWindowIdForApp(app.id)}
               >
-                <img src={app.icon} alt={app.title} className="h-[18px] w-[18px] object-contain" />
+                <img src={app.icon} alt={app.title} className="h-[20px] w-[20px] object-contain" />
               </TaskbarIconButton>
             )
           })}
@@ -173,7 +191,7 @@ export function Taskbar() {
                   hasIndicator={true}
                   dataWindowId={win.id}
                 >
-                  <img src={win.icon} alt={win.title} className="h-[18px] w-[18px] object-contain" />
+                  <img src={win.icon} alt={win.title} className="h-[20px] w-[20px] object-contain" />
                 </TaskbarIconButton>
               )
             })}
