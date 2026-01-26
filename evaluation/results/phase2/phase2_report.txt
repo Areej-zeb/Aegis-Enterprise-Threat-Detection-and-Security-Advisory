@@ -1,0 +1,59 @@
+======================================================================
+AEGIS ITERATION-2 - PHASE 2: SCENARIO-BASED EVALUATION REPORT
+======================================================================
+
+Timestamp: 2025-11-28T16:35:15.168187
+Model: artifacts/Syn/xgb_baseline.joblib
+Test Dataset: datasets/processed/Syn/test.parquet
+
+----------------------------------------------------------------------
+SCENARIO 1 ALL BENIGN
+----------------------------------------------------------------------
+Description: Pure benign traffic - stability test
+total_flows: 4656
+false_positives: 0
+fp_rate_percent: 0.0
+fp_per_10k_flows: 0.0
+processing_time_sec: 0.049181222915649414
+throughput_flows_per_sec: 94670.27706865878
+verdict: ✅ EXCELLENT - Very stable, minimal false alarms
+
+----------------------------------------------------------------------
+SCENARIO 2 PURE ATTACK
+----------------------------------------------------------------------
+Description: Pure attack traffic - sensitivity test
+total_flows: 5000
+detected: 5000
+missed: 0
+detection_rate_percent: 100.0
+avg_confidence: 0.9999977350234985
+processing_time_sec: 0.03928732872009277
+verdict: ✅ EXCELLENT - Near-perfect attack detection
+
+----------------------------------------------------------------------
+SCENARIO 3 MIXED TIMELINE
+----------------------------------------------------------------------
+Description: Mixed timeline - benign → attack → benign
+total_flows: 4800
+phase1_benign_flows: 3000
+phase1_false_positives: 0
+phase2_attack_flows: 300
+phase2_detection_rate_percent: 100.0
+phase2_detection_delay_flows: 0
+phase3_benign_flows: 1500
+phase3_false_positives: 0
+processing_time_sec: 0.044301748275756836
+verdict: ✅ EXCELLENT - Fast detection, minimal FP
+
+----------------------------------------------------------------------
+SCENARIO 4 STEALTH SLOW
+----------------------------------------------------------------------
+Description: Stealth slow attack - sparse attacks
+total_flows: 4756
+attack_count: 100
+attack_spacing: 50
+detected: 100
+detection_rate_percent: 100.0
+processing_time_sec: 0.02241063117980957
+verdict: ✅ EXCELLENT - Can detect sparse attacks
+

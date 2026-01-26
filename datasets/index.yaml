@@ -1,0 +1,29 @@
+# datasets/index.yaml
+# Canonical index of datasets used for Aegis IDS
+datasets:
+  cicids2017:
+    description: "Comprehensive IDS flows (multi-attack). Good for baselines and many labels."
+    instances: 2830000
+    file_format: "csv/parquet (flow-level)"
+    notes: "Contains many labels; timestamps need normalization; some duplicate flows."
+  cicddos2019:
+    description: "DDoS-focused dataset with multiple DDoS types and high-volume flows."
+    instances: 1200000
+    file_format: "csv/parquet"
+    notes: "High class imbalance; use sliding windows for sequence learning."
+  cicio_mt2024:
+    description: "IoMT flows, device-specific traffic"
+    instances: 200000
+    file_format: "csv"
+    notes: "Sensor/IoT behavior differs from general web traffic"
+  mitm_arp:
+    description: "MITM/ARP spoofing capture-derived flows"
+    instances: 50000
+    file_format: "pcap -> flow csv"
+    notes: "Use ARP flag and ARP-specific features"
+  probing_zyell_ntu:
+    description: "Probing / port-scan datasets"
+    instances: 150000
+    file_format: "csv"
+    notes: "High number of single-packet flows"
+label_map: "See backend/ids/config.yaml and backend/ids/schemas.py for canonical LABELS"

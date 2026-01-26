@@ -1,0 +1,35 @@
+======================================================================
+AEGIS ITERATION-2 - PHASE 1: DATASET-LEVEL EVALUATION REPORT
+======================================================================
+
+Timestamp: 2025-11-28T16:35:14.713944
+Model: artifacts/Syn/xgb_baseline.joblib
+Test Dataset: datasets/processed/Syn/test.parquet
+Test Size: 538,899 flows
+Evaluation Time: 0.76 seconds
+Throughput: 704586 flows/sec
+
+----------------------------------------------------------------------
+CLASSIFICATION REPORT
+----------------------------------------------------------------------
+
+BENIGN:
+  Precision: 0.9904
+  Recall:    1.0000
+  F1-Score:  0.9952
+  Support:   4,656
+
+DDoS_SYN:
+  Precision: 1.0000
+  Recall:    0.9999
+  F1-Score:  1.0000
+  Support:   534,243
+
+Overall Accuracy: 0.9999
+
+False Positive Rate per 10k flows: 0.00
+
+ROC-AUC: 1.0000
+PR-AUC:  1.0000
+
+Optimal Threshold: 0.3 (F1=1.0000)

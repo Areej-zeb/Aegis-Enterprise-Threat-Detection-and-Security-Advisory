@@ -1,0 +1,40 @@
+{
+  "dataset": "Syn",
+  "best_model": "XGBoost",
+  "timestamp": "2025-11-23T18:34:58.708643",
+  "models": {
+    "XGBoost": {
+      "accuracy": 0.9999164964121292,
+      "f1_macro": 0.9975722669268989,
+      "f1_weighted": 0.999916660204955,
+      "precision_macro": 0.995628048156598,
+      "recall_macro": 0.9995320746837258,
+      "roc_auc": 0.9999979112020423,
+      "per_class_metrics": {
+        "precision": {
+          "BENIGN": 0.9912635840613679,
+          "DDoS_SYN": 0.999992512251828
+        },
+        "recall": {
+          "BENIGN": 0.9991408934707904,
+          "DDoS_SYN": 0.9999232558966613
+        },
+        "f1_score": {
+          "BENIGN": 0.9951866509787143,
+          "DDoS_SYN": 0.9999578828750835
+        }
+      },
+      "confusion_matrix": [
+        [
+          4652,
+          4
+        ],
+        [
+          41,
+          534202
+        ]
+      ],
+      "inference_time": 0.30669593811035156
+    }
+  }
+}
