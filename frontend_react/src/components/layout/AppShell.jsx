@@ -12,7 +12,7 @@ import {
   Activity,
 } from "lucide-react";
 import aegisLogo from "../../assets/aegis-logo.png";
-import { useAuth } from "../../context/AuthContext.tsx";
+import { useAuth } from "../../context/AuthContext";
 import "../../index.css";
 
 const NAV_ITEMS = [
@@ -83,7 +83,7 @@ function AppShell({ children }) {
         onClick={() => setMobileMenuOpen(false)}
       />
 
-      <aside 
+      <aside
         className={`aegis-sidebar ${mobileMenuOpen ? "mobile-open" : ""}`}
         onMouseEnter={() => setIsCollapsed(false)}
         onMouseLeave={() => setIsCollapsed(true)}

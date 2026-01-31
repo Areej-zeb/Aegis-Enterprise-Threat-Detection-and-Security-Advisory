@@ -26,14 +26,20 @@ audit_logger = get_audit_logger()
 error_logger = get_error_logger()
 system_logger = get_system_logger()
 
+# Import pentest router
+from backend.pentest.api import router as pentest_router
+
 # ---------------------------------------------------------------------
 # App setup
 # ---------------------------------------------------------------------
 app = FastAPI(title="Aegis IDS Mock Service", version="0.2.0")
 
+# Include routers
+app.include_router(pentest_router)
+
 # Allow both Streamlit (8501) and Vite/React (5173) by default
 origins = os.getenv(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:8501"
+    "CORS_ALLOWED_ORIGINS", "http://localhost:5173"
 ).split(",")
 
 app.add_middleware(

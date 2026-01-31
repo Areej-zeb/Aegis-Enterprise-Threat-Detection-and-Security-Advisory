@@ -26,12 +26,12 @@ wsl --install -d Ubuntu
 git clone https://github.com/Areej-zeb/Aegis-Enterprise-Threat-Detection-and-Security-Advisory.git
 cd Aegis-Enterprise-Threat-Detection-and-Security-Advisory
 
-# 2. Start the application
+# 2. Start the application (Backend + Frontend)
 chmod +x start-aegis.sh
 ./start-aegis.sh
 ```
 
-**Access the web dashboard**: http://localhost:8501
+**Access the web dashboard**: http://localhost:5173
 
 ---
 
@@ -57,9 +57,9 @@ chmod +x start-aegis.sh
 
 ```
 ┌─────────────┐         ┌──────────────┐         ┌─────────────┐
-│   Network   │────────▶│  FastAPI     │────────▶│  Streamlit  │
+│   Network   │────────▶│  FastAPI     │────────▶│   React     │
 │   Traffic   │         │  Backend     │  HTTP   │   Web UI    │
-└─────────────┘         │  (Port 8000) │         │ (Port 8501) │
+└─────────────┘         │  (Port 8000) │         │ (Port 5173) │
                         └──────────────┘         └─────────────┘
                               │                         │
                               ▼                         ▼
@@ -70,7 +70,7 @@ chmod +x start-aegis.sh
 ```
 
 **Backend**: FastAPI + Uvicorn (REST API)  
-**Frontend**: Streamlit (Web Dashboard)  
+**Frontend**: React + Vite (Web Dashboard)  
 **ML Model**: XGBoost with SHAP explainability  
 **Access**: Any modern web browser
 
@@ -105,8 +105,9 @@ Aegis/
 │       ├── experiments/
 │       │   └── ids_baseline.md  # Model metrics
 │       └── config.yaml          # IDS configuration
-├── frontend_streamlit/
-│   └── app.py                   # 5-tab Streamlit dashboard
+├── frontend_react/
+│   ├── src/                     # React source code
+│   └── package.json             # Frontend dependencies
 ├── seed/
 │   ├── alerts.json              # Demo alert data (20 alerts)
 │   └── shap_example.json        # SHAP explainability data
@@ -144,16 +145,16 @@ export MODE=demo
 uvicorn backend.ids.serve.app:app --reload --host 0.0.0.0 --port 8000
 
 # 5. Start dashboard (Terminal 2)
-source venv/bin/activate
-cd frontend_streamlit
-streamlit run app.py --server.port 8501
+cd frontend_react
+npm install
+npm run dev
 ```
 
 ---
 
 ## 🌐 Access
 
-- **Dashboard**: http://localhost:8501
+- **Dashboard**: http://localhost:5173
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
@@ -180,7 +181,7 @@ Perfect for demonstrations and testing!
 
 ### Architecture Design
 - **Backend (Port 8000)**: Runs continuously 24/7, capturing traffic and generating alerts
-- **Dashboard (Port 8501)**: Web-based interface with 5 specialized tabs
+- **Dashboard (Port 5173)**: Web-based interface with 5 specialized tabs
 - **Live Alerts Tab**: Real-time threat feed with toggle-based auto-refresh
 - **Other Tabs**: Stable views for analysis without auto-reload interruptions
 
@@ -237,7 +238,6 @@ In a real enterprise environment:
 ```bash
 # Kill existing processes
 pkill -f uvicorn
-pkill -f streamlit
 ```
 
 ### Module not found
@@ -290,7 +290,7 @@ MIT License - See [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - XGBoost for ML framework
-- Streamlit for dashboard
+- React & Vite for dashboard
 - FastAPI for backend API
 - SHAP for model explainability
 

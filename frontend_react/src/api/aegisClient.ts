@@ -288,15 +288,15 @@ export async function checkHealth(): Promise<HealthStatus> {
         'Accept': 'application/json',
       },
     });
-    
+
     if (!response.ok) {
       console.error('[Health Check] HTTP error:', response.status, response.statusText);
       throw new Error(`Health check failed: ${response.statusText}`);
     }
-    
+
     const data = await response.json();
     console.log('[Health Check] Response:', data);
-    
+
     // Map your backend's format to expected format
     const healthStatus = {
       status: data.status || 'unknown',
@@ -310,7 +310,7 @@ export async function checkHealth(): Promise<HealthStatus> {
       // Store mode for environment detection
       mode: data.mode,
     } as any;
-    
+
     console.log('[Health Check] Mapped status:', healthStatus);
     return healthStatus;
   } catch (error) {
@@ -323,11 +323,11 @@ export async function checkHealth(): Promise<HealthStatus> {
 export async function getSystemStatus(): Promise<SystemStatus> {
   try {
     const response = await fetch(buildUrl("/api/system/status"));
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch system status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     console.log('[System Status] Received:', data);
     return data;
@@ -352,14 +352,14 @@ export async function fetchAlerts(
   // Use live detection endpoint for real ML predictions
   const numFlows = params?.page_size || 20;
   const response = await fetch(buildUrl("/api/detection/live", { n: numFlows }));
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch alerts: ${response.statusText}`);
   }
-  
+
   const data = await response.json();
   const rawDetections = data.detections || [];
-  
+
   // Map ML detections to alert format
   const alerts = rawDetections.map((det: any) => ({
     id: det.id,
@@ -390,7 +390,7 @@ export async function fetchAlerts(
       dst_port: det.dst_port,
     },
   }));
-  
+
   return {
     alerts,
     meta: {
@@ -408,11 +408,11 @@ export async function getMetricsOverview(
 ): Promise<MetricsOverview> {
   try {
     const response = await fetch(buildUrl("/api/metrics/overview"));
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch metrics: ${response.status}`);
     }
-    
+
     const data = await response.json();
     console.log('[Metrics] Received:', data);
     return data;
@@ -449,7 +449,7 @@ export async function getExplanation(
   // URL encode the detection ID to handle special characters
   const encodedId = encodeURIComponent(detectionId);
   const response = await fetch(buildUrl(`/api/explainability/${encodedId}`));
-  
+
   if (!response.ok) {
     // Try to get more specific error information
     let errorMessage = 'EXPLANATION_NOT_AVAILABLE';
@@ -468,7 +468,7 @@ export async function getExplanation(
     }
     throw new Error(errorMessage);
   }
-  
+
   return response.json();
 }
 
@@ -680,7 +680,7 @@ export async function fetchLiveDetections(
 ): Promise<LiveDetectionResponse> {
   const url = new URL(`${API_BASE_URL}/api/detection/live`);
   url.searchParams.set("n", numFlows.toString());
-  
+
   if (attackTypes && attackTypes.length > 0) {
     attackTypes.forEach(type => {
       url.searchParams.append("attack_types", type);
@@ -699,6 +699,86 @@ export async function fetchLiveDetections(
     throw new Error(
       errorData?.detail || `Failed to fetch detections (${response.status})`
     );
+  }
+
+  return response.json();
+}
+
+// ---------- Pentesting API ----------
+
+export interface PentestScan {
+  id: string;
+  target: string;
+  type: string;
+  status: "pending" | "running" | "completed" | "failed";
+  created_at: string;
+  completed_at?: string;
+  result?: any;
+  error?: string;
+}
+
+export interface PentestResponse {
+  scan_id: string;
+  status: string;
+}
+
+/**
+ * Trigger a new pentest scan
+ */
+export async function runPentest(
+  target: string,
+  scanType: "quick" | "full" | "stealth" = "quick"
+): Promise<PentestResponse> {
+  const response = await fetch(buildUrl("/api/pentest/scan"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ target, scan_type: scanType }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.detail || `Failed to start scan (${response.status})`
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Get results of a specific scan
+ */
+export async function getPentestResult(scanId: string): Promise<PentestScan> {
+  const response = await fetch(buildUrl(`/api/pentest/results/${scanId}`), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch scan results (${response.status})`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get history of all scans
+ */
+export async function getPentestHistory(): Promise<PentestScan[]> {
+  const response = await fetch(buildUrl("/api/pentest/history"), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    console.error("Failed to fetch pentest history");
+    return [];
   }
 
   return response.json();

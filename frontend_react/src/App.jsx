@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./index.css";
-import LoginPage from "./pages/LoginPage.jsx";
-import SignUpPage from "./pages/SignUpPage.jsx";
-import DashboardPage from "./pages/DashboardPage.jsx";
-import IDSPage from "./pages/IDSPage.jsx";
-import SettingsPage from "./pages/SettingsPage.tsx";
-import NotFoundPage from "./pages/NotFoundPage.tsx";
-import MLDetectionPage from "./pages/MLDetectionPage.jsx";
-import AppShell from "./components/layout/AppShell.jsx";
-import { AlertTimeSeriesProvider } from "./state/AlertTimeSeriesContext.tsx";
-import RequireAuth from "./routes/RequireAuth.tsx";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
+import DashboardPage from "./pages/DashboardPage";
+import IDSPage from "./pages/IDSPage";
+import SettingsPage from "./pages/SettingsPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import MLDetectionPage from "./pages/MLDetectionPage";
+import AppShell from "./components/layout/AppShell";
+import { AlertTimeSeriesProvider } from "./state/AlertTimeSeriesContext";
+import RequireAuth from "./routes/RequireAuth";
 
 function useCursorGlow() {
   useEffect(() => {

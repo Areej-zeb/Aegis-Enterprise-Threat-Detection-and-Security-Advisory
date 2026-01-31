@@ -17,25 +17,27 @@ import {
   Circle,
   Sparkles,
 } from "lucide-react";
-import RecentAlertCard from "../components/alerts/RecentAlertCard.jsx";
-import ThreatsDetectedCard from "../components/charts/ThreatsDetectedCard.tsx";
+import RecentAlertCard from "../components/alerts/RecentAlertCard";
+import ThreatsDetectedCard from "../components/charts/ThreatsDetectedCard";
 import { StatCard, StatusPill } from "../components/common";
-import { checkHealth, fetchLiveDetections } from "../api/aegisClient.ts";
-import { aggregateAlertsByTime } from "../utils/chartDataUtils.ts";
-import { useAlertTimeSeries } from "../state/AlertTimeSeriesContext.tsx";
+import { checkHealth, fetchLiveDetections, getPentestHistory, runPentest } from "../api/aegisClient";
+import { aggregateAlertsByTime } from "../utils/chartDataUtils";
+import { useAlertTimeSeries } from "../state/AlertTimeSeriesContext";
 
 // Type for threat data points with timestamps
 // Each point has: { timestamp: number, count: number }
 
 function DashboardPage() {
+  console.log("DashboardPage mounted"); // Debug log
   const [metrics, setMetrics] = useState(null);
   const [recentAlerts, setRecentAlerts] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [healthStatus, setHealthStatus] = useState(null);
+  const [pentestScans, setPentestScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   // Use the global alert time-series store
   const { series: alertSeries, addIncomingAlerts } = useAlertTimeSeries();
 
@@ -70,17 +72,17 @@ function DashboardPage() {
     if (!recentAlerts || recentAlerts.length === 0) {
       return [];
     }
-    
+
     // Count attack types from real detections
     const attackCounts = {};
     recentAlerts.forEach(alert => {
       const attackType = alert.attack_type || alert.model_type || 'Unknown';
       attackCounts[attackType] = (attackCounts[attackType] || 0) + 1;
     });
-    
+
     const total = Object.values(attackCounts).reduce((a, b) => a + b, 0);
     if (total === 0) return [];
-    
+
     return Object.entries(attackCounts)
       .map(([name, count]) => ({
         name: name.replace(/_/g, ' '),
@@ -98,19 +100,19 @@ function DashboardPage() {
 
       // Fetch REAL detections from trained ML models (50 samples for faster load)
       const liveDetections = await fetchLiveDetections(50);
-      
+
       // Transform to alerts format
       const transformedAlerts = liveDetections.detections.map(det => ({
         id: det.id,
         timestamp: det.timestamp,
-        attack_type: det.attack_type || det.model_type,
-        severity: det.severity.toLowerCase(),
-        score: det.score,
+        attack_type: det.attack_type || det.model_type || "Unknown",
+        severity: (det.severity || "medium").toLowerCase(),
+        score: det.score || 0,
         src_ip: det.src_ip || "—",
         dst_ip: det.dst_ip || "—",
         protocol: det.protocol || "TCP",
-        label: det.label,
-        model_type: det.model_type,
+        label: det.label || "BENIGN",
+        model_type: det.model_type || "Unknown",
         status: "new",
       }));
 
@@ -121,7 +123,7 @@ function DashboardPage() {
       const totalDetections = transformedAlerts.length;
       const attacks = transformedAlerts.filter(d => d.label === 'ATTACK').length;
       const benign = transformedAlerts.filter(d => d.label === 'BENIGN').length;
-      
+
       // Count by severity
       const severityCounts = transformedAlerts.reduce((acc, det) => {
         acc[det.severity] = (acc[det.severity] || 0) + 1;
@@ -171,6 +173,10 @@ function DashboardPage() {
       const healthData = await checkHealth().catch(() => null);
       setHealthStatus(healthData);
 
+      // Fetch Pentest History
+      const scans = await getPentestHistory();
+      setPentestScans(scans.slice(0, 5)); // Show last 5
+
     } catch (apiError) {
       console.error('[Dashboard] Failed to load real detections:', apiError);
       setError("Failed to load model predictions. Check if backend is running.");
@@ -185,6 +191,24 @@ function DashboardPage() {
     setIsRefreshing(false);
   };
 
+  const [targetIp, setTargetIp] = useState("localhost");
+
+  const handleStartQuickScan = async () => {
+    if (!targetIp) {
+      alert("Please enter a target IP");
+      return;
+    }
+
+    try {
+      await runPentest(targetIp, "quick");
+      // Reload after a short delay to see the pending scan
+      setTimeout(loadDashboardData, 1000);
+    } catch (e) {
+      console.error("Failed to start scan", e);
+      alert("Failed to start scan: " + e.message);
+    }
+  };
+
   // Convert global alert series to chartData format for Dashboard
   // Dashboard shows total count (sum of all severities) with 30-minute window
   useEffect(() => {
@@ -193,10 +217,10 @@ function DashboardPage() {
     const THIRTY_MIN = 30 * 60 * 1000;
     const windowStart = now - THIRTY_MIN;
     const BUCKET_MS = 60 * 1000; // 1 minute
-    
+
     // Filter and aggregate the global series
     const filtered = alertSeries.filter(p => p.timestamp >= windowStart);
-    
+
     if (filtered.length === 0) {
       setChartData([]);
       return;
@@ -280,17 +304,15 @@ function DashboardPage() {
         </div>
         <div className="ids-header-right-new">
           {/* Status pill */}
-          <div className={`ids-status-pill-neon ids-status-pill-neon--${
-            idsStatus.status === 'error' ? 'error' : 
-            idsStatus.status === 'warning' ? 'warning' : 
-            'healthy'
-          }`}>
+          <div className={`ids-status-pill-neon ids-status-pill-neon--${idsStatus.status === 'error' ? 'error' :
+            idsStatus.status === 'warning' ? 'warning' :
+              'healthy'
+            }`}>
             <Circle
-              className={`ids-status-dot-icon ${
-                idsStatus.status === 'error' ? 'ids-status-dot-icon--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-dot-icon--warning' : 
-                'ids-status-dot-icon--healthy'
-              }`}
+              className={`ids-status-dot-icon ${idsStatus.status === 'error' ? 'ids-status-dot-icon--error' :
+                idsStatus.status === 'warning' ? 'ids-status-dot-icon--warning' :
+                  'ids-status-dot-icon--healthy'
+                }`}
               fill="currentColor"
             />
             <span className="ids-status-text">
@@ -298,11 +320,10 @@ function DashboardPage() {
             </span>
             <span className="ids-status-separator">•</span>
             <span className="ids-status-text">
-              IDS: <span className={`ids-status-value ${
-                idsStatus.status === 'error' ? 'ids-status-value--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-value--warning' : 
-                'ids-status-value--healthy'
-              }`}>{idsStatus.label}</span>
+              IDS: <span className={`ids-status-value ${idsStatus.status === 'error' ? 'ids-status-value--error' :
+                idsStatus.status === 'warning' ? 'ids-status-value--warning' :
+                  'ids-status-value--healthy'
+                }`}>{idsStatus.label}</span>
             </span>
           </div>
 
@@ -311,11 +332,10 @@ function DashboardPage() {
             type="button"
             onClick={handleDashboardRefresh}
             disabled={isRefreshing}
-            className={`ids-refresh-btn-neon ids-refresh-btn-neon--${
-              idsStatus.status === 'error' ? 'error' : 
-              idsStatus.status === 'warning' ? 'warning' : 
-              'healthy'
-            }`}
+            className={`ids-refresh-btn-neon ids-refresh-btn-neon--${idsStatus.status === 'error' ? 'error' :
+              idsStatus.status === 'warning' ? 'warning' :
+                'healthy'
+              }`}
           >
             <RotateCw className={`ids-refresh-icon ${isRefreshing ? 'animate-spin-slow' : ''}`} />
             <span>Refresh</span>
@@ -400,24 +420,24 @@ function DashboardPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
             {/* Main Status Indicator */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span 
-                style={{ 
-                  width: '10px', 
-                  height: '10px', 
-                  borderRadius: '50%', 
-                  background: agentStatus.status === 'online' ? '#4ade80' : 
-                             agentStatus.status === 'degraded' ? '#fbbf24' : 
-                             '#f87171',
-                  boxShadow: agentStatus.status === 'online' ? '0 0 8px rgba(74, 222, 128, 0.5)' : 
-                             agentStatus.status === 'degraded' ? '0 0 8px rgba(251, 191, 36, 0.5)' : 
-                             '0 0 8px rgba(248, 113, 113, 0.5)'
+              <span
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  background: agentStatus.status === 'online' ? '#4ade80' :
+                    agentStatus.status === 'degraded' ? '#fbbf24' :
+                      '#f87171',
+                  boxShadow: agentStatus.status === 'online' ? '0 0 8px rgba(74, 222, 128, 0.5)' :
+                    agentStatus.status === 'degraded' ? '0 0 8px rgba(251, 191, 36, 0.5)' :
+                      '0 0 8px rgba(248, 113, 113, 0.5)'
                 }}
               />
               <span className="aegis-stat-value" style={{ fontSize: '22px' }}>
                 {agentStatus.status.charAt(0).toUpperCase() + agentStatus.status.slice(1)}
               </span>
             </div>
-            
+
             {/* Secondary Metrics - Two Columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' }}>
               <div>
@@ -445,7 +465,7 @@ function DashboardPage() {
                 </div>
               </div>
             </div>
-            
+
             {/* Footer - Agent ID */}
             <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
               Agent ID: {agentStatus.agentId}
@@ -469,7 +489,7 @@ function DashboardPage() {
                 { bg: 'rgba(6, 182, 212, 0.15)', fill: '#22d3ee' },
               ];
               const color = barColors[index] || barColors[0];
-              
+
               return (
                 <div key={attack.name} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -480,16 +500,16 @@ function DashboardPage() {
                       {attack.percentage}%
                     </span>
                   </div>
-                  <div style={{ 
-                    width: '100%', 
-                    height: '6px', 
-                    background: color.bg, 
+                  <div style={{
+                    width: '100%',
+                    height: '6px',
+                    background: color.bg,
                     borderRadius: '3px',
                     overflow: 'hidden'
                   }}>
-                    <div style={{ 
-                      width: `${attack.percentage}%`, 
-                      height: '100%', 
+                    <div style={{
+                      width: `${attack.percentage}%`,
+                      height: '100%',
                       background: color.fill,
                       borderRadius: '3px',
                       transition: 'width 0.3s ease'
@@ -518,11 +538,11 @@ function DashboardPage() {
               </div>
               <StatusPill status={riskScore.level} />
             </div>
-            
+
             {/* Mini Breakdown */}
-            <div style={{ 
-              fontSize: '11px', 
-              color: '#9ca9cb', 
+            <div style={{
+              fontSize: '11px',
+              color: '#9ca9cb',
               lineHeight: '1.5',
               paddingTop: '4px',
               borderTop: '1px solid rgba(148, 163, 184, 0.1)'
@@ -535,7 +555,7 @@ function DashboardPage() {
 
       <section className="aegis-dash-main-grid">
         <div className="aegis-dash-left-col">
-          <ThreatsDetectedCard 
+          <ThreatsDetectedCard
             data={chartData}
             loading={loading}
             emptyMessage="Connect the IDS API to visualize detections over time."
@@ -546,81 +566,73 @@ function DashboardPage() {
               <div>
                 <h2>Pentesting Summary</h2>
                 <p className="aegis-card-subtext">
-                  Last 7 pentests · click a row to open full report
+                  Latest network exposure scans
                 </p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={targetIp}
+                  onChange={(e) => setTargetIp(e.target.value)}
+                  placeholder="Target IP (e.g., localhost)"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '4px',
+                    color: '#fff',
+                    padding: '4px 8px',
+                    fontSize: '12px'
+                  }}
+                />
+                <button
+                  className="ids-refresh-btn-neon"
+                  style={{ height: '32px', fontSize: '12px' }}
+                  onClick={handleStartQuickScan}
+                >
+                  + New Scan
+                </button>
               </div>
             </div>
             <div className="aegis-table-wrapper">
               <table className="aegis-table">
                 <thead>
                   <tr>
-                    <th>Test</th>
+                    <th>Scan ID</th>
+                    <th>Target</th>
                     <th>Type</th>
                     <th>Status</th>
-                    <th>Severity</th>
+                    <th>Ports</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>OB 123</td>
-                    <td>Network</td>
-                    <td>
-                      <span className="aegis-status-pill aegis-status-pill--success">
-                        Completed
-                      </span>
-                    </td>
-                    <td className="aegis-table-severity">
-                      <span className="sev sev-low">Low</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>PT 108</td>
-                    <td>Firewall</td>
-                    <td>
-                      <span className="aegis-status-pill aegis-status-pill--success">
-                        Completed
-                      </span>
-                    </td>
-                    <td className="aegis-table-severity">
-                      <span className="sev sev-medium">Medium</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>PT 107</td>
-                    <td>IDS Scan</td>
-                    <td>
-                      <span className="aegis-status-pill aegis-status-pill--success">
-                        Completed
-                      </span>
-                    </td>
-                    <td className="aegis-table-severity">
-                      <span className="sev sev-low">Low</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>OB 106</td>
-                    <td>IDS Scan</td>
-                    <td>
-                      <span className="aegis-status-pill aegis-status-pill--pending">
-                        Pending
-                      </span>
-                    </td>
-                    <td className="aegis-table-severity">
-                      <span className="sev sev-high">High</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>PT 099</td>
-                    <td>Web App</td>
-                    <td>
-                      <span className="aegis-status-pill aegis-status-pill--error">
-                        Failed
-                      </span>
-                    </td>
-                    <td className="aegis-table-severity">
-                      <span className="sev sev-high">High</span>
-                    </td>
-                  </tr>
+                  {pentestScans.length > 0 ? (
+                    pentestScans.map((scan) => (
+                      <tr key={scan.id}>
+                        <td style={{ fontFamily: 'monospace' }}>{scan.id.substring(0, 8)}</td>
+                        <td>{scan.target}</td>
+                        <td style={{ textTransform: 'capitalize' }}>{scan.type}</td>
+                        <td>
+                          <span className={`aegis-status-pill aegis-status-pill--${scan.status === 'completed' ? 'success' :
+                            scan.status === 'failed' ? 'error' :
+                              'pending'
+                            }`}>
+                            {scan.status}
+                          </span>
+                        </td>
+                        <td>
+                          {scan.status === 'completed' && scan.result?.hosts?.[0]?.ports
+                            ? scan.result.hosts[0].ports.length
+                            : '-'}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} style={{ textAlign: 'center', color: '#888' }}>
+                        No scans performed yet.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
