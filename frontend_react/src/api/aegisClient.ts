@@ -706,6 +706,38 @@ export async function fetchLiveDetections(
 
 // ---------- Pentesting API ----------
 
+export interface Vulnerability {
+  id: string;
+  cve_id?: string;
+  severity_score: number;
+  severity_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  known_exploited: boolean;
+  title?: string;
+  description: string;
+}
+
+export interface Port {
+  port: number;
+  protocol: string;
+  state: string;
+  service: string;
+  product?: string;
+  version?: string;
+  vulnerabilities?: Vulnerability[];
+  risk_score?: number;
+  vuln_count?: number;
+}
+
+export interface Host {
+  ip: string;
+  status: string;
+  ports: Port[];
+}
+
+export interface PentestResult {
+  hosts: Host[];
+}
+
 export interface PentestScan {
   id: string;
   target: string;
@@ -713,7 +745,7 @@ export interface PentestScan {
   status: "pending" | "running" | "completed" | "failed";
   created_at: string;
   completed_at?: string;
-  result?: any;
+  result?: PentestResult;
   error?: string;
 }
 

@@ -11,6 +11,7 @@ import MLDetectionPage from "./pages/MLDetectionPage";
 import AppShell from "./components/layout/AppShell";
 import { AlertTimeSeriesProvider } from "./state/AlertTimeSeriesContext";
 import RequireAuth from "./routes/RequireAuth";
+import PentestPage from "./pages/PentestPage";
 
 function useCursorGlow() {
   useEffect(() => {
@@ -138,6 +139,14 @@ function App() {
             element={
               <AppShell>
                 <MLDetectionPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/pentest"
+            element={
+              <AppShell>
+                <PentestPage />
               </AppShell>
             }
           />

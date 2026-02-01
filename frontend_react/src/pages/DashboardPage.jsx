@@ -16,10 +16,13 @@ import {
   RotateCw,
   Circle,
   Sparkles,
+  AlertTriangle,
+  ChevronUp,
+  ChevronDown
 } from "lucide-react";
 import RecentAlertCard from "../components/alerts/RecentAlertCard";
 import ThreatsDetectedCard from "../components/charts/ThreatsDetectedCard";
-import { StatCard, StatusPill } from "../components/common";
+import { StatCard, StatusPill, SeverityBadge } from "../components/common";
 import { checkHealth, fetchLiveDetections, getPentestHistory, runPentest } from "../api/aegisClient";
 import { aggregateAlertsByTime } from "../utils/chartDataUtils";
 import { useAlertTimeSeries } from "../state/AlertTimeSeriesContext";
@@ -30,6 +33,7 @@ import { useAlertTimeSeries } from "../state/AlertTimeSeriesContext";
 function DashboardPage() {
   console.log("DashboardPage mounted"); // Debug log
   const [metrics, setMetrics] = useState(null);
+  const [expandedScanId, setExpandedScanId] = useState(null);
   const [recentAlerts, setRecentAlerts] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [healthStatus, setHealthStatus] = useState(null);
@@ -601,34 +605,117 @@ function DashboardPage() {
                     <th>Target</th>
                     <th>Type</th>
                     <th>Status</th>
+                    <th>Risk Level</th>
                     <th>Ports</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {pentestScans.length > 0 ? (
                     pentestScans.map((scan) => (
-                      <tr key={scan.id}>
-                        <td style={{ fontFamily: 'monospace' }}>{scan.id.substring(0, 8)}</td>
-                        <td>{scan.target}</td>
-                        <td style={{ textTransform: 'capitalize' }}>{scan.type}</td>
-                        <td>
-                          <span className={`aegis-status-pill aegis-status-pill--${scan.status === 'completed' ? 'success' :
-                            scan.status === 'failed' ? 'error' :
-                              'pending'
-                            }`}>
-                            {scan.status}
-                          </span>
-                        </td>
-                        <td>
-                          {scan.status === 'completed' && scan.result?.hosts?.[0]?.ports
-                            ? scan.result.hosts[0].ports.length
-                            : '-'}
-                        </td>
-                      </tr>
+                      <React.Fragment key={scan.id}>
+                        <tr
+                          onClick={() => setExpandedScanId(expandedScanId === scan.id ? null : scan.id)}
+                          style={{ cursor: 'pointer', backgroundColor: expandedScanId === scan.id ? 'rgba(255,255,255,0.02)' : 'transparent' }}
+                        >
+                          <td style={{ fontFamily: 'monospace' }}>{scan.id.substring(0, 8)}</td>
+                          <td>{scan.target}</td>
+                          <td style={{ textTransform: 'capitalize' }}>{scan.type}</td>
+                          <td>
+                            <StatusPill status={scan.status} />
+                          </td>
+                          <td>
+                            {/* Risk Summary Calculation */}
+                            {(() => {
+                              if (scan.status !== 'completed' || !scan.result?.hosts?.[0]?.ports) return '-';
+                              const ports = scan.result.hosts[0].ports;
+                              let maxScore = 0;
+                              let kevCount = 0;
+                              let vulnCount = 0;
+                              ports.forEach(p => {
+                                if (p.vulnerabilities) {
+                                  vulnCount += p.vulnerabilities.length;
+                                  p.vulnerabilities.forEach(v => {
+                                    if (v.severity_score > maxScore) maxScore = v.severity_score;
+                                    if (v.known_exploited) kevCount++;
+                                  });
+                                }
+                              });
+
+                              if (kevCount > 0) return <span className="text-red-500 font-bold flex items-center gap-1"><AlertTriangle size={14} /> {kevCount} KEV!</span>;
+                              if (maxScore >= 9.0) return <span className="text-red-500 font-bold">Critical ({maxScore})</span>;
+                              if (maxScore >= 7.0) return <span className="text-orange-500 font-bold">High ({maxScore})</span>;
+                              if (vulnCount > 0) return <span className="text-yellow-500">Medium ({vulnCount})</span>;
+                              return <span className="text-green-500">Safe</span>;
+                            })()}
+                          </td>
+                          <td>
+                            {scan.status === 'completed' && scan.result?.hosts?.[0]?.ports
+                              ? scan.result.hosts[0].ports.length
+                              : '-'}
+                          </td>
+                          <td>
+                            {expandedScanId === scan.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                          </td>
+                        </tr>
+                        {/* Expanded Detail View */}
+                        {expandedScanId === scan.id && scan.result?.hosts?.[0]?.ports && (
+                          <tr>
+                            <td colSpan={7} style={{ padding: '0', background: 'rgba(0,0,0,0.2)' }}>
+                              <div style={{ padding: '1rem' }}>
+                                <h4 className="text-sm font-bold mb-2 text-gray-400">Scan Results Detail ({scan.target})</h4>
+                                <div className="grid gap-2">
+                                  {scan.result.hosts[0].ports.map((port, idx) => (
+                                    <div key={idx} className="bg-gray-800/50 p-3 rounded border border-gray-700">
+                                      <div className="flex justify-between items-center mb-2">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-mono text-blue-400">{port.port}/{port.protocol}</span>
+                                          <span className="font-semibold">{port.service}</span>
+                                          {port.product && <span className="text-gray-400 text-sm">({port.product} {port.version})</span>}
+                                        </div>
+                                        {port.risk_score ? (
+                                          <span className={`text-xs px-2 py-0.5 rounded ${port.risk_score >= 9 ? 'bg-red-900/50 text-red-200' : 'bg-gray-700 text-gray-300'}`}>
+                                            Risk: {port.risk_score}
+                                          </span>
+                                        ) : null}
+                                      </div>
+
+                                      {/* Vulnerabilities List */}
+                                      {port.vulnerabilities && port.vulnerabilities.length > 0 ? (
+                                        <div className="mt-2 space-y-1">
+                                          {port.vulnerabilities.map((vuln, vIdx) => (
+                                            <div key={vIdx} className="flex items-start gap-2 text-xs p-1 hover:bg-white/5 rounded">
+                                              <SeverityBadge severity={vuln.severity_level} />
+                                              <div className="flex-1">
+                                                <div className="flex items-center gap-2">
+                                                  <span className="font-mono font-bold text-gray-300">{vuln.id}</span>
+                                                  {vuln.known_exploited && (
+                                                    <span className="bg-red-600 text-white px-1 rounded text-[10px] uppercase font-bold animate-pulse">
+                                                      Exploited in Wild
+                                                    </span>
+                                                  )}
+                                                  <span className="text-gray-500">CVSS {vuln.severity_score}</span>
+                                                </div>
+                                                <p className="text-gray-400 line-clamp-1">{vuln.description || "No description available."}</p>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      ) : (
+                                        <div className="text-xs text-green-500/50 italic ml-4">No Known Vulnerabilities</div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', color: '#888' }}>
+                      <td colSpan={7} style={{ textAlign: 'center', color: '#888' }}>
                         No scans performed yet.
                       </td>
                     </tr>
