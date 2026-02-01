@@ -2,7 +2,7 @@ import React from "react";
 import { SeverityBadge } from "../common";
 import "../../index.css";
 
-function RecentAlertCard({ id, title, severity = "Medium", time, source }) {
+function RecentAlertCard({ id, title, severity = "Medium", time, source, correlation }) {
   const sev = severity.toLowerCase().trim();
 
   return (
@@ -20,9 +20,31 @@ function RecentAlertCard({ id, title, severity = "Medium", time, source }) {
             {time}
             {source ? ` • ${source}` : ""}
           </span>
-
           <SeverityBadge severity={severity} withIcon={false} />
         </div>
+
+        {/* Smart Context / Correlation Hit */}
+        {correlation && correlation.is_vulnerable && (
+          <div style={{
+            marginTop: '8px',
+            padding: '6px 8px',
+            background: 'rgba(220, 38, 38, 0.1)',
+            border: '1px solid rgba(220, 38, 38, 0.3)',
+            borderRadius: '4px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '10px', fontWeight: '800', color: '#ef4444', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                ⚠️ Target Vulnerable
+              </span>
+            </div>
+            <span style={{ fontSize: '11px', color: '#fca5a5' }}>
+              {correlation.message}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

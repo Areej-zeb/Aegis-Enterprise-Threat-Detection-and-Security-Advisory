@@ -98,6 +98,13 @@ export interface DetectionLabels {
   [key: string]: any;
 }
 
+export interface CorrelationContext {
+  is_vulnerable: boolean;
+  asset_known: boolean;
+  vulnerabilities: any[];
+  message: string;
+}
+
 export interface DetectionResult {
   id: string;
   timestamp: string;
@@ -108,6 +115,7 @@ export interface DetectionResult {
   severity: Severity;
   labels: DetectionLabels;
   explanation_available: boolean;
+  correlation_context?: CorrelationContext;
   [key: string]: any;
 }
 
@@ -130,6 +138,7 @@ export interface Alert {
   score?: number;
   description?: string;
   tags?: string[];
+  correlation_context?: CorrelationContext;
   meta?: {
     model_name?: string;
     rule_id?: string;

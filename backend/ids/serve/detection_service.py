@@ -20,6 +20,7 @@ from .logger_config import (
     get_error_logger,
     log_with_extra
 )
+from backend.ids.engine.correlation import CorrelationEngine
 
 # Suppress sklearn feature name warnings
 warnings.filterwarnings('ignore', message='X has feature names')
@@ -269,6 +270,10 @@ class DetectionService:
                 "model_type": attack_type
             }
             
+            # --- CORRELATION ENGINE ENRICHMENT ---
+            result = CorrelationEngine.enrich_alert(result)
+            # -------------------------------------
+            
             # Log detection
             log_with_extra(
                 self.detection_logger,
@@ -457,6 +462,11 @@ class DetectionService:
             if attack_type in self._prediction_cache and self._prediction_cache[attack_type]:
                 # Pop from cache (FIFO)
                 detection = self._prediction_cache[attack_type].pop(0)
+                
+                # --- CORRELATION ENGINE ENRICHMENT ---
+                detection = CorrelationEngine.enrich_alert(detection)
+                # -------------------------------------
+                
                 detections.append(detection)
                 
                 # Only log attacks with high confidence (reduce logging overhead)

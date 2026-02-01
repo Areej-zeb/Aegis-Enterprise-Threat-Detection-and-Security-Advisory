@@ -117,7 +117,9 @@ function DashboardPage() {
         protocol: det.protocol || "TCP",
         label: det.label || "BENIGN",
         model_type: det.model_type || "Unknown",
+        model_type: det.model_type || "Unknown",
         status: "new",
+        correlation_context: det.correlation_context,
       }));
 
       // Set recent alerts (latest 4 for display)
@@ -763,6 +765,7 @@ function DashboardPage() {
                     severity={alert.severity}
                     time={`Detected ${new Date(alert.timestamp).toLocaleString()}`}
                     source={alert.source_ip || alert.src_ip || 'Unknown'}
+                    correlation={alert.correlation_context}
                   />
                 ))
               ) : (

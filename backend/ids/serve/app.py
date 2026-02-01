@@ -37,6 +37,10 @@ app = FastAPI(title="Aegis IDS Mock Service", version="0.2.0")
 # Include routers
 app.include_router(pentest_router)
 
+# Import and include Mock Auth router
+from backend.ids.serve.mock_auth import router as auth_router
+app.include_router(auth_router)
+
 # Allow both Streamlit (8501) and Vite/React (5173) by default
 origins = os.getenv(
     "CORS_ALLOWED_ORIGINS", "http://localhost:5173"

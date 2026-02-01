@@ -26,7 +26,7 @@ echo "🚀 Starting FastAPI backend (port 8000)..."
 # Start backend in background
 echo "🚀 Starting FastAPI backend (port 8000)..."
 export PYTHONPATH=$PYTHONPATH:.
-uvicorn backend.ids.serve.app:app --port 8000 &
+uvicorn backend.ids.serve.app:app --host 0.0.0.0 --port 8000 &
 BACKEND_PID=$!
 
 # Wait for backend to start
