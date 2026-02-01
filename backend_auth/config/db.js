@@ -8,7 +8,10 @@ export const connectDB = async () => {
     console.log("✅ MongoDB connected");
   } catch (error) {
     console.error("❌ MongoDB connection error:", error.message);
-    process.exit(1);
+    console.warn("\n⚠️  FALLBACK MODE ENABLED:");
+    console.warn("   Email: admin@aegis.local");
+    console.warn("   Password: admin123\n");
+    // Don't exit—allow fallback auth to work
   }
 };
 
