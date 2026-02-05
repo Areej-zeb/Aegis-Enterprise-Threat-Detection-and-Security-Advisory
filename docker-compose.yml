@@ -1,0 +1,134 @@
+# ==============================================================================
+# Aegis Enterprise Threat Detection - Docker Compose
+# ==============================================================================
+# Multi-container setup for the complete Aegis application
+# Services: Frontend (React), Backend (FastAPI), Auth (Node.js), MongoDB
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # MongoDB Database
+  # ===========================================================================
+  mongodb:
+    image: mongo:7.0
+    container_name: aegis-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-aegis_secure_password}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-aegis_auth}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - aegis-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # ===========================================================================
+  # Authentication Service (Node.js + Express)
+  # ===========================================================================
+  auth:
+    build:
+      context: ./backend_auth
+      dockerfile: Dockerfile
+    container_name: aegis-auth
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-aegis_secure_password}@mongodb:27017/${MONGO_DB:-aegis_auth}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-your_jwt_secret_key_change_in_production}
+      JWT_EXPIRE: ${JWT_EXPIRE:-7d}
+    ports:
+      - "5000:5000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - aegis-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ===========================================================================
+  # Backend Service (Python + FastAPI)
+  # ===========================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: aegis-backend
+    restart: unless-stopped
+    environment:
+      MODE: ${MODE:-static}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://frontend}
+      PYTHONUNBUFFERED: 1
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount logs directory for persistence
+      - ./backend/ids/logs:/app/backend/ids/logs
+      # Mount artifacts for ML models (read-only)
+      - ./artifacts:/app/artifacts:ro
+      # Mount datasets (read-only)
+      - ./datasets:/app/datasets:ro
+    networks:
+      - aegis-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ===========================================================================
+  # Frontend Service (React + Nginx)
+  # ===========================================================================
+  frontend:
+    build:
+      context: ./frontend_react
+      dockerfile: Dockerfile
+    container_name: aegis-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - auth
+    networks:
+      - aegis-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+# ==============================================================================
+# Networks
+# ==============================================================================
+networks:
+  aegis-network:
+    driver: bridge
+    name: aegis-network
+
+# ==============================================================================
+# Volumes
+# ==============================================================================
+volumes:
+  mongodb_data:
+    name: aegis-mongodb-data
+  mongodb_config:
+    name: aegis-mongodb-config

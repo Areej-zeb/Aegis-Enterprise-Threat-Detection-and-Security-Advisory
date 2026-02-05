@@ -1,0 +1,126 @@
+# ==============================================================================
+# Aegis Development - Docker Compose
+# ==============================================================================
+# Development setup with hot-reload and source code mounting
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # MongoDB Database
+  # ===========================================================================
+  mongodb:
+    image: mongo:7.0
+    container_name: aegis-mongodb-dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: dev_password
+      MONGO_INITDB_DATABASE: aegis_auth_dev
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_dev_data:/data/db
+    networks:
+      - aegis-dev-network
+
+  # ===========================================================================
+  # Authentication Service (Node.js + Express)
+  # ===========================================================================
+  auth:
+    build:
+      context: ./backend_auth
+      dockerfile: Dockerfile
+    container_name: aegis-auth-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:dev_password@mongodb:27017/aegis_auth_dev?authSource=admin
+      JWT_SECRET: dev_jwt_secret_key_not_for_production
+      JWT_EXPIRE: 7d
+    ports:
+      - "5000:5000"
+    volumes:
+      # Mount source code for hot-reload
+      - ./backend_auth:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - aegis-dev-network
+    command: npm run dev
+
+  # ===========================================================================
+  # Backend Service (Python + FastAPI)
+  # ===========================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: aegis-backend-dev
+    restart: unless-stopped
+    environment:
+      MODE: demo
+      CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:5174,http://localhost:80
+      PYTHONUNBUFFERED: 1
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount source code for hot-reload
+      - ./backend:/app/backend
+      - ./aegis_alert_adapter.py:/app/aegis_alert_adapter.py
+      - ./aegis_alert_bridge.py:/app/aegis_alert_bridge.py
+      - ./aegis_alert_stream.py:/app/aegis_alert_stream.py
+      - ./alert_stream.py:/app/alert_stream.py
+      - ./alert_stream_config.py:/app/alert_stream_config.py
+      # Mount artifacts and datasets
+      - ./artifacts:/app/artifacts
+      - ./seed:/app/seed
+      - ./datasets:/app/datasets
+      # Mount logs
+      - ./backend/ids/logs:/app/backend/ids/logs
+    networks:
+      - aegis-dev-network
+
+  # ===========================================================================
+  # Frontend Service (React + Vite Dev Server)
+  # ===========================================================================
+  frontend:
+    build:
+      context: ./frontend_react
+      dockerfile: Dockerfile.dev
+      target: development
+    container_name: aegis-frontend-dev
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_AUTH_URL=http://localhost:5000
+    ports:
+      - "5173:5173"
+    volumes:
+      # Mount source code for hot-reload
+      - ./frontend_react:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+      - auth
+    networks:
+      - aegis-dev-network
+    command: npm run dev -- --host 0.0.0.0
+
+# ==============================================================================
+# Networks
+# ==============================================================================
+networks:
+  aegis-dev-network:
+    driver: bridge
+    name: aegis-dev-network
+
+# ==============================================================================
+# Volumes
+# ==============================================================================
+volumes:
+  mongodb_dev_data:
+    name: aegis-mongodb-dev-data
