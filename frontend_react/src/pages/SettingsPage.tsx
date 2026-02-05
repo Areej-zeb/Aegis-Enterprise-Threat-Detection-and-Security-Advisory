@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../index.css";
 import "./SettingsPage.css";
-import { Settings, Bell, Zap, Plug2, Save, Circle } from "lucide-react";
+import { Settings, Bell, Zap, Plug2, Save, Circle, RefreshCw } from "lucide-react";
 import { checkHealth } from "../api/aegisClient";
+import { StatusPill } from "../components/common";
 
 type TabType = "general" | "alerts" | "notifications" | "integrations";
 
@@ -25,6 +26,13 @@ function SettingsPage() {
   const [environment, setEnvironment] = useState<"demo" | "live">("demo");
   const [timezone, setTimezone] = useState("UTC");
   const [dateFormat, setDateFormat] = useState("YYYY-MM-DD");
+  const [showMockButton, setShowMockButton] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("showMockButton") === "true";
+    } catch (e) {
+      return false;
+    }
+  });
 
   // Alerts & Detection settings state
   const [attackToggles, setAttackToggles] = useState<AttackToggle[]>([
@@ -59,6 +67,14 @@ function SettingsPage() {
       enabled: true,
     },
   ]);
+
+  const [mockStreamEnabled, setMockStreamEnabled] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("aegis_mock_stream_enabled") === "true";
+    } catch (e) {
+      return false;
+    }
+  });
 
   const [detectionSensitivity, setDetectionSensitivity] = useState<number>(70);
   const [minSeverityForAlert, setMinSeverityForAlert] = useState<"low" | "medium" | "high" | "critical">("low");
@@ -100,6 +116,16 @@ function SettingsPage() {
     );
   };
 
+  const handleShowMockButtonChange = (value: boolean) => {
+    setShowMockButton(value);
+    try {
+      localStorage.setItem("showMockButton", value ? "true" : "false");
+    } catch (e) {
+      // ignore
+    }
+    window.dispatchEvent(new Event("mockButtonToggle"));
+  };
+
   const getSensitivityLabel = (value: number): string => {
     if (value <= 40) return "Low";
     if (value <= 70) return "Balanced";
@@ -113,6 +139,8 @@ function SettingsPage() {
       environment,
       timezone,
       dateFormat,
+      showMockButton,
+      mockStreamEnabled,
       // Alerts & Detection
       attackToggles,
       detectionSensitivity,
@@ -139,6 +167,19 @@ function SettingsPage() {
     };
     console.log("Saving settings:", settings);
     // TODO: Add API call to save settings
+    alert("Settings saved successfully!");
+  };
+
+  const handleMockStreamToggle = (enabled: boolean) => {
+    setMockStreamEnabled(enabled);
+    localStorage.setItem("aegis_mock_stream_enabled", enabled.toString());
+    
+    // Dispatch event for other components to listen to
+    window.dispatchEvent(new CustomEvent('mockStreamToggle', {
+      detail: { enabled }
+    }));
+    
+    console.log(`Mock stream ${enabled ? 'enabled' : 'disabled'}`);
   };
 
   const handleTestSlack = () => {
@@ -214,32 +255,8 @@ function SettingsPage() {
           </p>
         </div>
         <div className="ids-header-right-new">
-          {/* Status pill */}
-          <div className={`ids-status-pill-neon ids-status-pill-neon--${
-            idsStatus.status === 'error' ? 'error' : 
-            idsStatus.status === 'warning' ? 'warning' : 
-            'healthy'
-          }`}>
-            <Circle
-              className={`ids-status-dot-icon ${
-                idsStatus.status === 'error' ? 'ids-status-dot-icon--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-dot-icon--warning' : 
-                'ids-status-dot-icon--healthy'
-              }`}
-              fill="currentColor"
-            />
-            <span className="ids-status-text">
-              Env: <span className="ids-status-value">{environmentLabel}</span>
-            </span>
-            <span className="ids-status-separator">•</span>
-            <span className="ids-status-text">
-              IDS: <span className={`ids-status-value ${
-                idsStatus.status === 'error' ? 'ids-status-value--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-value--warning' : 
-                'ids-status-value--healthy'
-              }`}>{idsStatus.label}</span>
-            </span>
-          </div>
+          {/* Unified Status pill */}
+          <StatusPill />
         </div>
       </header>
 
@@ -447,6 +464,52 @@ function SettingsPage() {
                       }}
                     >
                       Live
+                    </button>
+                  </div>
+                </div>
+
+                {/* NEW: Mock Stream Toggle */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <label style={{ fontSize: "14px", fontWeight: 600, color: "#e5e7eb" }}>
+                    Mock Data Stream
+                  </label>
+                  <p style={{ fontSize: "12px", color: "#9ca9cb", margin: 0, marginBottom: "4px" }}>
+                    Show synthetic alert stream for testing and demonstration.
+                  </p>
+                  <div style={{ display: "flex", gap: "8px", padding: "4px", background: "rgba(15, 23, 42, 0.6)", borderRadius: "8px", border: "1px solid rgba(148, 163, 184, 0.2)" }}>
+                    <button
+                      onClick={() => handleMockStreamToggle(false)}
+                      style={{
+                        flex: 1,
+                        padding: "8px 16px",
+                        background: !mockStreamEnabled ? "rgba(59, 130, 246, 0.2)" : "transparent",
+                        border: !mockStreamEnabled ? "1px solid #60a5fa" : "1px solid transparent",
+                        borderRadius: "6px",
+                        color: !mockStreamEnabled ? "#60a5fa" : "#9ca9cb",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      Off
+                    </button>
+                    <button
+                      onClick={() => handleMockStreamToggle(true)}
+                      style={{
+                        flex: 1,
+                        padding: "8px 16px",
+                        background: mockStreamEnabled ? "rgba(59, 130, 246, 0.2)" : "transparent",
+                        border: mockStreamEnabled ? "1px solid #60a5fa" : "1px solid transparent",
+                        borderRadius: "6px",
+                        color: mockStreamEnabled ? "#60a5fa" : "#9ca9cb",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      On
                     </button>
                   </div>
                 </div>

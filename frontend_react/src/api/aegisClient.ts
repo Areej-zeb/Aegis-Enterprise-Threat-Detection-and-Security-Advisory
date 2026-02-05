@@ -824,3 +824,11 @@ export async function getPentestHistory(): Promise<PentestScan[]> {
 
   return response.json();
 }
+
+/**
+ * Get report for a specific scan (placeholder for future PDF generation)
+ */
+export async function getPentestReport(scanId: string): Promise<{ url: string }> {
+  // For now, return a mock URL since the backend doesn't have report generation yet
+  return { url: `/api/pentest/results/${scanId}` };
+}

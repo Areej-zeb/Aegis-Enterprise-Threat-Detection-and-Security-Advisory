@@ -1,4 +1,4 @@
-import React from "react"; 
+import React, { useMemo } from "react"; 
 import {
   ResponsiveContainer,
   LineChart,
@@ -8,6 +8,8 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
+import { useSystemStatus } from "../../hooks/useSystemStatus";
+import { generateMonthlyThreats } from "../../utils/mockDataGenerator";
 import "./ThreatsDetectedCard.css";
 
 export type ThreatPoint = {
@@ -32,13 +34,33 @@ const ThreatsDetectedCard: React.FC<ThreatsDetectedCardProps> = ({
   loading = false,
   emptyMessage = "No threat data available.",
 }) => {
+  const { systemStatus } = useSystemStatus();
+  const isMockMode = systemStatus.mockStream === 'ON';
+  
+  // Generate mock data when in mock mode and no real data
+  const mockData = useMemo(() => {
+    if (!isMockMode) return null;
+    
+    const monthlyData = generateMonthlyThreats();
+    return monthlyData.slice(-7).map(item => ({
+      label: item.month,
+      value: item.value
+    }));
+  }, [isMockMode]);
+  
+  // Use mock data if in mock mode and no real data provided
+  const chartData = useMemo(() => {
+    if (data && data.length > 0) return data;
+    if (isMockMode && mockData) return mockData;
+    return [];
+  }, [data, isMockMode, mockData]);
+  
   // Only render chart if we have at least 2 data points
-  const hasEnoughData = data && data.length >= 2;
-  const isEmpty = !data || data.length === 0;
-  const hasSinglePoint = data && data.length === 1;
+  const hasEnoughData = chartData && chartData.length >= 2;
+  const isEmpty = chartData.length === 0;
+  const hasSinglePoint = chartData.length === 1;
   
   // Calculate dynamic Y-axis domain if not provided
-  const chartData = hasEnoughData ? data : [];
   const values = chartData.map(d => d.value);
   const calculatedMinY = minY !== undefined ? minY : (values.length > 0 ? Math.max(0, Math.min(...values) - 5) : 0);
   const calculatedMaxY = maxY !== undefined ? maxY : (values.length > 0 ? Math.max(...values) + 5 : 10);
@@ -47,6 +69,15 @@ const ThreatsDetectedCard: React.FC<ThreatsDetectedCardProps> = ({
     <div className="aegis-card">
       <div className="aegis-card-header">
         <h2>{title}</h2>
+        {isMockMode && hasEnoughData && (
+          <span style={{ 
+            fontSize: '10px', 
+            color: '#64748b', 
+            fontStyle: 'italic' 
+          }}>
+            Mock Data
+          </span>
+        )}
       </div>
 
       <div className="threats-card__chart">
@@ -58,7 +89,7 @@ const ThreatsDetectedCard: React.FC<ThreatsDetectedCardProps> = ({
           </div>
         ) : isEmpty || hasSinglePoint ? (
           <div className="threats-card__empty">
-            <p>{isEmpty ? emptyMessage : "Not enough recent data to display a trend yet."}</p>
+            <p>{isEmpty ? (isMockMode ? "Generating mock data..." : emptyMessage) : "Not enough recent data to display a trend yet."}</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={220}>

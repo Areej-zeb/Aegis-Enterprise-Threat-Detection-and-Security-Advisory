@@ -209,3 +209,48 @@ export function generateMockRiskScore() {
     inputsSummary: `${randInt(10, 80)} active alerts · ${randInt(1, 5)} exposed services · ${randInt(0, 4)} high-severity findings`,
   };
 }
+
+// Simple mock stream factory that emits alerts and metrics on intervals.
+export function createMockStream({ alertIntervalMs = 1500, metricsIntervalMs = 5000 } = {}) {
+  let alertTimer: NodeJS.Timeout | null = null;
+  let metricsTimer: NodeJS.Timeout | null = null;
+
+  const alertListeners = new Set<(a: Alert) => void>();
+  const metricsListeners = new Set<(m: MetricsOverview) => void>();
+
+  function start() {
+    if (!alertTimer) {
+      alertTimer = setInterval(() => {
+        const alert = generateMockAlert();
+        alertListeners.forEach(cb => {
+          try { cb(alert); } catch (e) { /* swallow listener errors */ }
+        });
+      }, alertIntervalMs);
+    }
+
+    if (!metricsTimer) {
+      // emit an initial metrics snapshot immediately
+      const initial = generateMockOverviewMetrics();
+      metricsListeners.forEach(cb => { try { cb(initial); } catch (e) {} });
+
+      metricsTimer = setInterval(() => {
+        // perturb metrics to simulate smooth changes
+        const perturbed = perturbMetrics(metricsListeners.size ? generateMockOverviewMetrics() : generateMockOverviewMetrics());
+        metricsListeners.forEach(cb => { try { cb(perturbed); } catch (e) {} });
+      }, metricsIntervalMs);
+    }
+  }
+
+  function stop() {
+    if (alertTimer) { clearInterval(alertTimer); alertTimer = null; }
+    if (metricsTimer) { clearInterval(metricsTimer); metricsTimer = null; }
+  }
+
+  function onAlert(cb: (a: Alert) => void) { alertListeners.add(cb); }
+  function offAlert(cb: (a: Alert) => void) { alertListeners.delete(cb); }
+
+  function onMetrics(cb: (m: MetricsOverview) => void) { metricsListeners.add(cb); }
+  function offMetrics(cb: (m: MetricsOverview) => void) { metricsListeners.delete(cb); }
+
+  return { start, stop, onAlert, offAlert, onMetrics, offMetrics };
+}

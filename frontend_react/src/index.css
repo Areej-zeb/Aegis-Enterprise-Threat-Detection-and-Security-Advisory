@@ -17,14 +17,90 @@
 }
 
 :root {
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
+  /* typography */
+  --font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-size-base: 16px;
+  --line-height: 1.5;
+
+  /* colors */
+  --color-text: #f5f7fb;
+  --color-muted: #9fb3d9;
+  --color-bg: #050b1a;
+  --primary-1: #4c7dff;
+  --primary-2: #5ac9ff;
+
+  /* semantic severity tokens (ensure contrast) */
+  --severity-critical: #ff6b6b;
+  --severity-high: #ff9f43;
+  --severity-medium: #f6c244;
+  --severity-low: #34d399;
+
+  /* spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* radii & elevation */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 28px;
+  --elevation-1: 0 8px 24px rgba(6, 12, 27, 0.45);
+
+  /* card tokens */
+  --card-bg: rgba(10, 18, 39, 0.85);
+  --card-padding: var(--space-5);
+
+  /* focus */
+  --focus-ring: 0 0 0 3px rgba(90, 201, 255, 0.18);
+
+  font-family: var(--font-family);
+  line-height: var(--line-height);
   font-weight: 400;
-  color: #f5f7fb;
-  background-color: #050b1a;
+  color: var(--color-text);
+  background-color: var(--color-bg);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Primitive card styles (used by new Card component) */
+.prm-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: var(--card-padding);
+  box-shadow: var(--elevation-1);
+  display: block;
+}
+
+.prm-card-header {
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+}
+
+.prm-card-body {
+  padding: 0;
+}
+
+.prm-card-footer {
+  margin-top: var(--space-4);
+}
+
+/* Accessible table row primitive */
+.prm-table-row {
+  cursor: default;
+}
+
+.prm-table-row[tabindex="0"]:focus {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.prm-table-row--selected {
+  background: rgba(90, 201, 255, 0.06);
+}
+
 
 *,
 *::before,
@@ -2318,8 +2394,31 @@ button {
   color: #86efac;
 }
 
+.ids-status-value--mock-on {
+  color: #4ade80;
+  font-weight: 700;
+}
+
+.ids-status-value--mock-off {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
 .ids-status-separator {
   color: #64748b;
+}
+
+/* Loading state for status pill */
+.ids-status-pill-neon--loading {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(148, 163, 184, 0.08);
+  color: #cbd5e1;
+  box-shadow: 0 0 12px rgba(148, 163, 184, 0.25);
+}
+
+.ids-status-dot-icon--loading {
+  color: #94a3b8;
+  filter: drop-shadow(0 0 6px rgba(148, 163, 184, 0.6));
 }
 
 /* Refresh Button - Base */
@@ -2392,6 +2491,54 @@ button {
   height: 14px;
 }
 
+/* Mock Stream Toggle Button - Purple Pill */
+.ids-mock-stream-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  background: rgba(168, 85, 247, 0.08);
+  color: #e9d5ff;
+}
+
+@media (min-width: 768px) {
+  .ids-mock-stream-btn {
+    padding: 6px 16px;
+    font-size: 12px;
+  }
+}
+
+.ids-mock-stream-btn:hover:not(:disabled) {
+  background: rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+}
+
+.ids-mock-stream-btn--active {
+  border: 1px solid rgba(168, 85, 247, 0.6);
+  background: rgba(168, 85, 247, 0.2);
+  color: #f3e8ff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+}
+
+.ids-mock-stream-btn--active:hover:not(:disabled) {
+  background: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+}
+
+.ids-mock-stream-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.ids-mock-stream-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 /* Mock Stream Button */
 .ids-mock-stream-btn {
   display: inline-flex;
@@ -4437,4 +4584,603 @@ img {
     width: 14px;
     height: 14px;
   }
+}
+
+
+/*pentest*/
+/* Pentest Page Specific Styles */
+
+/* Scan Controls */
+.ids-scan-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ids-scan-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ids-scan-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ids-scan-input-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+}
+
+.ids-scan-input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.ids-scan-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.ids-scan-input::placeholder {
+  color: #64748b;
+}
+
+.ids-scan-options {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.ids-scan-type-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ids-scan-type-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ids-scan-type-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ids-scan-type-btn--active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+}
+
+.ids-scan-start-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ids-scan-start-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.ids-scan-start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ids-scan-start-btn--scanning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.ids-scan-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ids-scan-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.ids-scan-hint svg {
+  flex-shrink: 0;
+}
+
+.ids-scan-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ids-scan-progress-bar {
+  width: 120px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ids-scan-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #3b82f6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.ids-scan-progress-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #3b82f6;
+  min-width: 40px;
+}
+
+/* Scan Status Badges */
+.ids-scan-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.ids-scan-status--completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+}
+
+.ids-scan-status--running {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+}
+
+.ids-scan-status--failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.ids-scan-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.ids-scan-status-dot--completed {
+  background: #4ade80;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+}
+
+.ids-scan-status-dot--running {
+  background: #60a5fa;
+  box-shadow: 0 0 6px rgba(96, 165, 250, 0.5);
+}
+
+.ids-scan-status-dot--failed {
+  background: #f87171;
+  box-shadow: 0 0 6px rgba(248, 113, 113, 0.5);
+}
+
+/* Scan Table Styles */
+.ids-scan-row {
+  transition: background-color 0.2s ease;
+}
+
+.ids-scan-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ids-scan-row--expanded {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ids-scan-row--running {
+  animation: pulse-row 2s infinite;
+}
+
+@keyframes pulse-row {
+  0%, 100% {
+    background: rgba(59, 130, 246, 0.05);
+  }
+  50% {
+    background: rgba(59, 130, 246, 0.1);
+  }
+}
+
+.ids-scan-target {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.ids-scan-type-badge {
+  padding: 2px 8px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
+  color: #a78bfa;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.ids-scan-risk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ids-scan-ports {
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.ids-kev-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: rgba(220, 38, 38, 0.15);
+  border-radius: 4px;
+  color: #fca5a5;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ids-scan-safe {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.ids-scan-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.ids-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ids-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.ids-action-btn--view:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.ids-action-btn--download:hover {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.ids-action-btn--delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.ids-action-btn--expand:hover {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+}
+
+/* Scan Details */
+.ids-scan-details {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ids-scan-details-header {
+  margin-bottom: 16px;
+}
+
+.ids-scan-details-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #e5e7eb;
+}
+
+.ids-scan-details-subtitle {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.ids-vuln-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ids-vuln-item {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+.ids-vuln-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ids-vuln-id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ids-vuln-id code {
+  font-family: monospace;
+  font-size: 12px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.ids-vuln-score {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.ids-vuln-score-value {
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.ids-vuln-description {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Risk Distribution */
+.ids-risk-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ids-risk-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ids-risk-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.ids-risk-count {
+  font-weight: 600;
+  color: #e5e7eb;
+  font-size: 14px;
+}
+
+.ids-risk-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ids-risk-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.ids-risk-percentage {
+  min-width: 40px;
+  text-align: right;
+  font-weight: 600;
+  color: #e5e7eb;
+  font-size: 13px;
+}
+
+/* Top Services */
+.ids-top-services {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ids-service-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.ids-service-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ids-service-port {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ids-service-port-number {
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: #60a5fa;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.ids-service-name {
+  font-size: 13px;
+  color: #e5e7eb;
+  font-weight: 500;
+}
+
+.ids-service-metrics {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ids-service-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ids-service-count span:first-child {
+  font-weight: 600;
+  color: #e5e7eb;
+  font-size: 14px;
+}
+
+.ids-service-label {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* Loading and Empty States */
+.ids-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: #64748b;
+}
+
+.ids-loading-state svg {
+  margin-bottom: 12px;
+}
+
+.ids-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.ids-empty-state svg {
+  margin-bottom: 16px;
+  color: #64748b;
+}
+
+.ids-empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #e5e7eb;
+}
+
+.ids-empty-state p {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* Alert Styles */
+.aegis-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  color: #fca5a5;
+  margin-bottom: 24px;
+}
+
+.aegis-alert--error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.aegis-alert svg {
+  flex-shrink: 0;
+}
+
+.aegis-alert-btn {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aegis-alert-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
 }

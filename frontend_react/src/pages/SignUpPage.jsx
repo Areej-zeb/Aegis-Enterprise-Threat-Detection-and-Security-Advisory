@@ -10,6 +10,7 @@ import CheckboxWithText from "../components/form/CheckboxWithText.jsx";
 import PasswordStrengthBar from "../components/feedback/PasswordStrengthBar.jsx";
 import MatchLabel from "../components/feedback/MatchLabel.jsx";
 import PrimaryButton from "../components/buttons/PrimaryButton.jsx";
+import StatusBar from "../components/common/StatusBar.jsx";
 import authService from "../utils/authService.js";
 
 function getPasswordScore(password) {
@@ -111,6 +112,7 @@ function SignUpPage() {
       title="Create a Secure AEGIS Account"
       subtitle="Access our enterprise security dashboard, alerts & advisory tools."
     >
+      <StatusBar env="Demo" ids="Healthy" />
       <form className="aegis-auth-form" onSubmit={handleSubmit}>
         {error && (
           <div style={{

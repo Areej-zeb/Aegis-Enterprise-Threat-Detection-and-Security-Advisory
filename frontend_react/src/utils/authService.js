@@ -41,7 +41,7 @@ class AuthService {
       localStorage.setItem('aegis_user', JSON.stringify(data.user));
 
       return { success: true, user: data.user };
-    } catch (error) {
+    } catch {
       // Network error or other unexpected error
       return { 
         success: false, 
@@ -80,7 +80,7 @@ class AuthService {
       localStorage.setItem('aegis_user', JSON.stringify(data.user));
 
       return { success: true, user: data.user };
-    } catch (error) {
+    } catch {
       // Network error or other unexpected error
       return { 
         success: false, 

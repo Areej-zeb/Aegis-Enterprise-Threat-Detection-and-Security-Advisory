@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import "../index.css";
 import { AlertTriangle, RefreshCcw, Search, RotateCw, Circle, Wifi, WifiOff, Skull } from "lucide-react";
-import { fetchAlerts, checkHealth, fetchLiveDetections } from "../api/aegisClient.ts";
+import { checkHealth, fetchLiveDetections } from "../api/aegisClient.ts";
 import RecentAlertTrends from "../components/RecentAlertTrends.tsx";
-import { ErrorAlert } from "../components/common";
+import { ErrorAlert, StatusPill } from "../components/common";
 import { useWebSocketAlerts } from "../hooks/useWebSocketAlerts.ts";
 import { AlertToast } from "../components/alerts/AlertToast.tsx";
+import { useSystemStatus } from "../hooks/useSystemStatus.ts";
+import { generateRecentAlerts } from "../utils/mockDataGenerator.ts";
 
 function LiveAlertsPage() {
   const [alerts, setAlerts] = useState([]);
@@ -19,6 +21,9 @@ function LiveAlertsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [useWebSocket, setUseWebSocket] = useState(true);
   const [toastAlert, setToastAlert] = useState(null);
+
+  // Get system status for mock mode detection
+  const { systemStatus } = useSystemStatus();
 
   // WebSocket integration for real-time alerts
   const handleNewAlert = useCallback((newAlert) => {
@@ -35,8 +40,6 @@ function LiveAlertsPage() {
 
   const {
     isConnected: wsConnected,
-    lastAlert: wsLastAlert,
-    error: wsError,
     reconnectAttempts,
   } = useWebSocketAlerts({
     enabled: useWebSocket && autoRefresh,
@@ -46,12 +49,36 @@ function LiveAlertsPage() {
     },
   });
 
-  async function loadAlerts({ silent = false } = {}) {
+  const loadAlerts = useCallback(async ({ silent = false } = {}) => {
     try {
       if (!silent) {
         setLoading(true);
       }
       setError(null);
+
+      // CHECK: If mock is ON, use mock data instead of API
+      if (systemStatus.mockStream === 'ON') {
+        console.log('[Live Alerts] Using mock data (Mock: ON)');
+        const mockAlertsData = generateRecentAlerts(25);
+        // Transform to match expected format
+        const transformedMockAlerts = mockAlertsData.map(alert => ({
+          id: alert.id,
+          timestamp: alert.timestamp,
+          attack_type: alert.attack_type,
+          severity: alert.severity.toLowerCase(),
+          score: alert.score,
+          src_ip: alert.src_ip,
+          dst_ip: alert.dst_ip,
+          protocol: "TCP",
+          label: alert.attack_type,
+          model_type: "Mock Model",
+          status: alert.status,
+        }));
+        
+        setAlerts(transformedMockAlerts);
+        setHealthStatus({ status: 'healthy', components: { database: 'demo' } });
+        return;
+      }
 
       try {
         // Fetch real ML detections from trained models
@@ -80,8 +107,29 @@ function LiveAlertsPage() {
         const healthData = await checkHealth().catch(() => null);
         setHealthStatus(healthData);
       } catch (apiErr) {
-        console.error('Failed to load live detections:', apiErr);
-        setError('Unable to connect to ML detection service');
+        // If API fails but mock is ON, still use mock data
+        if (systemStatus.mockStream === 'ON') {
+          console.log('[Live Alerts] API failed, using mock fallback');
+          const mockAlertsData = generateRecentAlerts(25);
+          const transformedMockAlerts = mockAlertsData.map(alert => ({
+            id: alert.id,
+            timestamp: alert.timestamp,
+            attack_type: alert.attack_type,
+            severity: alert.severity.toLowerCase(),
+            score: alert.score,
+            src_ip: alert.src_ip,
+            dst_ip: alert.dst_ip,
+            protocol: "TCP",
+            label: alert.attack_type,
+            model_type: "Mock Model",
+            status: alert.status,
+          }));
+          setAlerts(transformedMockAlerts);
+          setHealthStatus({ status: 'healthy', components: { database: 'demo' } });
+        } else {
+          console.error('Failed to load live detections:', apiErr);
+          setError('Unable to connect to ML detection service');
+        }
       }
     } catch (err) {
       console.error("Failed to load alerts:", err);
@@ -89,7 +137,7 @@ function LiveAlertsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [attackTypeFilter, systemStatus.mockStream]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -116,12 +164,10 @@ function LiveAlertsPage() {
 
   const idsStatus = getIDSStatus();
   // Check backend mode
-  const backendMode = healthStatus?.mode || (healthStatus?.components?.database);
-  const environmentLabel = (backendMode === 'demo' || backendMode === 'static') ? 'Demo' : 'Production';
 
   useEffect(() => {
     loadAlerts();
-  }, [severityFilter, attackTypeFilter]);
+  }, [loadAlerts]);
 
   useEffect(() => {
     if (!autoRefresh) return;
@@ -137,7 +183,7 @@ function LiveAlertsPage() {
     return () => {
       clearInterval(intervalId);
     };
-  }, [autoRefresh, severityFilter, attackTypeFilter]);
+  }, [autoRefresh, loadAlerts]);
 
   const filteredAlerts = useMemo(() => {
     const base = [...alerts].sort((a, b) => {
@@ -230,32 +276,8 @@ function LiveAlertsPage() {
             Polling (5s)
           </label>
 
-          {/* Status pill */}
-          <div className={`ids-status-pill-neon ids-status-pill-neon--${
-            idsStatus.status === 'error' ? 'error' : 
-            idsStatus.status === 'warning' ? 'warning' : 
-            'healthy'
-          }`}>
-            <Circle
-              className={`ids-status-dot-icon ${
-                idsStatus.status === 'error' ? 'ids-status-dot-icon--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-dot-icon--warning' : 
-                'ids-status-dot-icon--healthy'
-              }`}
-              fill="currentColor"
-            />
-            <span className="ids-status-text">
-              Env: <span className="ids-status-value">{environmentLabel}</span>
-            </span>
-            <span className="ids-status-separator">•</span>
-            <span className="ids-status-text">
-              IDS: <span className={`ids-status-value ${
-                idsStatus.status === 'error' ? 'ids-status-value--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-value--warning' : 
-                'ids-status-value--healthy'
-              }`}>{idsStatus.label}</span>
-            </span>
-          </div>
+          {/* Unified Status pill */}
+          <StatusPill />
 
           {/* Refresh button */}
           <button

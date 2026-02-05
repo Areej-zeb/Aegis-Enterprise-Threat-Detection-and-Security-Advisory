@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "../index.css";
+import "./SettingsPage.css";
 import {
   Bell,
   UserRound,
@@ -18,13 +19,15 @@ import {
   Sparkles,
   AlertTriangle,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Zap
 } from "lucide-react";
 import RecentAlertCard from "../components/alerts/RecentAlertCard";
+import { RecentAlertsList } from "../components/alerts/RecentAlertsList.tsx";
 import ThreatsDetectedCard from "../components/charts/ThreatsDetectedCard";
 import { StatCard, StatusPill, SeverityBadge } from "../components/common";
+import { useMockAwareMetrics } from "../components/dashboard/MockAwareMetrics.tsx";
 import { checkHealth, fetchLiveDetections, getPentestHistory, runPentest } from "../api/aegisClient";
-import { aggregateAlertsByTime } from "../utils/chartDataUtils";
 import { useAlertTimeSeries } from "../state/AlertTimeSeriesContext";
 
 // Type for threat data points with timestamps
@@ -42,6 +45,10 @@ function DashboardPage() {
   const [error, setError] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Use mock-aware metrics
+  const { metrics: displayMetrics, loading: metricsLoading, isMockMode } = useMockAwareMetrics(metrics, loading);
+  
+
   // Use the global alert time-series store
   const { series: alertSeries, addIncomingAlerts } = useAlertTimeSeries();
 
@@ -55,7 +62,7 @@ function DashboardPage() {
     lastUpdated: "checking...",
   });
 
-  const [agentStatus, setAgentStatus] = useState({
+  const [agentStatus] = useState({
     status: "online",
     lastHeartbeatSeconds: 12,
     cpuUsage: 34,
@@ -64,12 +71,11 @@ function DashboardPage() {
     agentId: "aegis-edge-01",
   });
 
-  const [riskScore, setRiskScore] = useState({
+  const [riskScore] = useState({
     score: 62,
     level: "moderate",
     inputsSummary: "50 active alerts · 3 exposed services · 2 high-severity findings",
   });
-
 
   // Calculate top attacks from REAL model detections
   const topAttacks = useMemo(() => {
@@ -116,7 +122,6 @@ function DashboardPage() {
         dst_ip: det.dst_ip || "—",
         protocol: det.protocol || "TCP",
         label: det.label || "BENIGN",
-        model_type: det.model_type || "Unknown",
         model_type: det.model_type || "Unknown",
         status: "new",
         correlation_context: det.correlation_context,
@@ -189,7 +194,7 @@ function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [addIncomingAlerts]);
 
   const handleDashboardRefresh = async () => {
     setIsRefreshing(true);
@@ -296,8 +301,6 @@ function DashboardPage() {
   };
 
   const idsStatus = getIDSStatus();
-  const backendMode = healthStatus?.mode || (healthStatus?.components?.database);
-  const environmentLabel = backendMode === 'demo' || backendMode === 'static' ? 'Demo' : 'ML Models Active';
 
   return (
     <div className="aegis-page">
@@ -309,29 +312,8 @@ function DashboardPage() {
           </p>
         </div>
         <div className="ids-header-right-new">
-          {/* Status pill */}
-          <div className={`ids-status-pill-neon ids-status-pill-neon--${idsStatus.status === 'error' ? 'error' :
-            idsStatus.status === 'warning' ? 'warning' :
-              'healthy'
-            }`}>
-            <Circle
-              className={`ids-status-dot-icon ${idsStatus.status === 'error' ? 'ids-status-dot-icon--error' :
-                idsStatus.status === 'warning' ? 'ids-status-dot-icon--warning' :
-                  'ids-status-dot-icon--healthy'
-                }`}
-              fill="currentColor"
-            />
-            <span className="ids-status-text">
-              Env: <span className="ids-status-value">{environmentLabel}</span>
-            </span>
-            <span className="ids-status-separator">•</span>
-            <span className="ids-status-text">
-              IDS: <span className={`ids-status-value ${idsStatus.status === 'error' ? 'ids-status-value--error' :
-                idsStatus.status === 'warning' ? 'ids-status-value--warning' :
-                  'ids-status-value--healthy'
-                }`}>{idsStatus.label}</span>
-            </span>
-          </div>
+          {/* Unified Status pill */}
+          <StatusPill />
 
           {/* Refresh button */}
           <button
@@ -358,14 +340,16 @@ function DashboardPage() {
       <section className="aegis-dash-top-row">
         <StatCard
           label="Active Alerts"
-          value={loading ? "..." : metrics?.total_alerts || "0"}
+          value={displayMetrics?.total_alerts}
+          loading={metricsLoading}
           delta="+12.4%"
           trend="up"
           Icon={Shield}
         />
         <StatCard
-          label="Total Detections"
-          value={loading ? "..." : metrics?.total_detections || "0"}
+          label={`Total Detections${isMockMode ? ' (mock)' : ''}`}
+          value={displayMetrics?.total_detections}
+          loading={metricsLoading}
           delta="+17.9%"
           trend="up"
           Icon={Activity}
@@ -378,8 +362,9 @@ function DashboardPage() {
           Icon={Clock3}
         />
         <StatCard
-          label="Detection Rate"
-          value={loading ? "..." : metrics?.detection_rate ? `${(metrics.detection_rate * 100).toFixed(1)}%` : "N/A"}
+          label={`Detection Rate${isMockMode ? ' (mock)' : ''}`}
+          value={displayMetrics?.detection_rate ? `${(displayMetrics.detection_rate * 100).toFixed(1)}%` : undefined}
+          loading={metricsLoading}
           delta="+5.7%"
           trend="up"
           Icon={Lightbulb}
@@ -402,7 +387,6 @@ function DashboardPage() {
                 <span className="aegis-stat-value">{modelHealth.f1Score.toFixed(2)}</span>
                 <span style={{ fontSize: '11px', color: '#9ca9cb' }}>F1 Score</span>
               </div>
-              <StatusPill status={modelHealth.status} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '12px', color: '#9ca9cb' }}>
@@ -485,7 +469,7 @@ function DashboardPage() {
             <div className="aegis-stat-icon">
               <ShieldHalf size={18} strokeWidth={1.6} />
             </div>
-            <span className="aegis-stat-label">Top Attack Types</span>
+            <span className="aegis-stat-label">Top Attack Types{isMockMode ? ' (mock)' : ''}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
             {topAttacks.map((attack, index) => {
@@ -542,7 +526,6 @@ function DashboardPage() {
                 <span className="aegis-stat-value">{riskScore.score}</span>
                 <span style={{ fontSize: '16px', color: '#9ca9cb', fontWeight: 500 }}>/ 100</span>
               </div>
-              <StatusPill status={riskScore.level} />
             </div>
 
             {/* Mini Breakdown */}
@@ -562,6 +545,7 @@ function DashboardPage() {
       <section className="aegis-dash-main-grid">
         <div className="aegis-dash-left-col">
           <ThreatsDetectedCard
+            title={`Threats Detected${isMockMode ? ' (mock)' : ''}`}
             data={chartData}
             loading={loading}
             emptyMessage="Connect the IDS API to visualize detections over time."
@@ -754,6 +738,12 @@ function DashboardPage() {
               </button>
             </div>
             <div className="aegis-alerts-list">
+              <RecentAlertsList 
+                alerts={recentAlerts}
+                loading={loading}
+                maxItems={4}
+                emptyMessage="No recent alerts"
+              />
               {loading ? (
                 <p style={{ padding: '1rem', textAlign: 'center', color: '#888' }}>Loading alerts...</p>
               ) : recentAlerts.length > 0 ? (

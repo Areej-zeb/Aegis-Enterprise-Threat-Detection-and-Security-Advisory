@@ -1,0 +1,43 @@
+/* Design Tokens - CSS Variables */
+
+:root {
+  /* Colors */
+  --color-primary: #2563eb;
+  --color-secondary: #64748b;
+  --color-error: #dc2626;
+  --color-success: #16a34a;
+  --color-warning: #ea580c;
+  --color-info: #0891b2;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+  --spacing-4xl: 64px;
+
+  /* Typography */
+  --font-size-h1: 32px;
+  --font-weight-h1: 700;
+  --line-height-h1: 40px;
+
+  --font-size-h2: 24px;
+  --font-weight-h2: 600;
+  --line-height-h2: 32px;
+
+  --font-size-body: 16px;
+  --font-weight-body: 400;
+  --line-height-body: 24px;
+
+  --font-size-caption: 14px;
+  --font-weight-caption: 400;
+  --line-height-caption: 20px;
+
+  /* Border Radius */
+  --border-radius-small: 4px;
+  --border-radius-medium: 8px;
+  --border-radius-large: 16px;
+}

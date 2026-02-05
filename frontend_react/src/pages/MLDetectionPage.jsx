@@ -23,8 +23,9 @@ import {
   Circle
 } from 'lucide-react';
 import { exportDetectionsAsJSON, exportDetectionsAsCSV } from '../api/detectionClient';
-import { SeverityBadge } from '../components/common';
+import { SeverityBadge, StatusPill } from '../components/common';
 import { getSeverityColor, CRITICAL_SEVERITY_COLOR } from '../utils/severityUtils';
+import { useSystemStatus } from '../hooks/useSystemStatus';
 import '../index.css';
 
 export default function MLDetectionPage() {
@@ -32,6 +33,10 @@ export default function MLDetectionPage() {
   const [severityFilter, setSeverityFilter] = useState(['critical', 'high', 'medium', 'low']);
   const [autoScroll, setAutoScroll] = useState(true);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  
+  // Get system status for mock mode detection
+  const { systemStatus } = useSystemStatus();
+  const isMockMode = systemStatus.mockStream === 'ON';
   
   const {
     detections,
@@ -43,7 +48,6 @@ export default function MLDetectionPage() {
     connect,
     disconnect,
     clearDetections,
-    refreshMetrics,
     fetchBatchDetections
   } = useLiveDetection({ maxAlerts: 200 });
   
@@ -59,12 +63,6 @@ export default function MLDetectionPage() {
   const threats = detections.filter(d => d.label === 'ATTACK').length;
   const benign = detections.filter(d => d.label === 'BENIGN').length;
   const criticalAlerts = detections.filter(d => d.severity === 'critical').length;
-  
-  // Attack type distribution
-  const attackDistribution = detections.reduce((acc, d) => {
-    acc[d.model_type] = (acc[d.model_type] || 0) + 1;
-    return acc;
-  }, {});
   
   useEffect(() => {
     if (autoScroll) {
@@ -112,26 +110,8 @@ export default function MLDetectionPage() {
           </p>
         </div>
         <div className="ids-header-right-new">
-          {/* Status pill */}
-          <div className={`ids-status-pill-neon ids-status-pill-neon--${
-            isConnected ? 'healthy' : 
-            error ? 'error' : 
-            'warning'
-          }`}>
-            <Circle
-              className={`ids-status-dot-icon ${
-                isConnected ? 'ids-status-dot-icon--healthy' : 
-                error ? 'ids-status-dot-icon--error' : 
-                'ids-status-dot-icon--warning'
-              }`}
-              fill="currentColor"
-            />
-            <span className="ids-status-text">
-              Status: <span className="ids-status-value">
-                {isConnected ? 'Live' : error ? 'Error' : 'Ready'}
-              </span>
-            </span>
-          </div>
+          {/* Unified Status pill */}
+          <StatusPill />
         </div>
       </header>
 
@@ -206,7 +186,7 @@ export default function MLDetectionPage() {
             <div className="aegis-stat-icon">
               <Activity size={18} strokeWidth={1.6} />
             </div>
-            <span className="aegis-stat-label">Total Detections</span>
+            <span className="aegis-stat-label">Total Detections{isMockMode ? ' (mock)' : ''}</span>
           </div>
           <div className="aegis-stat-main-row">
             <span className="aegis-stat-value">{totalDetections}</span>
@@ -218,7 +198,7 @@ export default function MLDetectionPage() {
             <div className="aegis-stat-icon">
               <Shield size={18} strokeWidth={1.6} />
             </div>
-            <span className="aegis-stat-label">Threats Detected</span>
+            <span className="aegis-stat-label">Threats Detected{isMockMode ? ' (mock)' : ''}</span>
           </div>
           <div className="aegis-stat-main-row">
             <span className="aegis-stat-value" style={{ color: '#f87171' }}>{threats}</span>
@@ -230,7 +210,7 @@ export default function MLDetectionPage() {
             <div className="aegis-stat-icon">
               <CheckCircle size={18} strokeWidth={1.6} />
             </div>
-            <span className="aegis-stat-label">Benign Traffic</span>
+            <span className="aegis-stat-label">Benign Traffic{isMockMode ? ' (mock)' : ''}</span>
           </div>
           <div className="aegis-stat-main-row">
             <span className="aegis-stat-value" style={{ color: '#4ade80' }}>{benign}</span>
@@ -242,7 +222,7 @@ export default function MLDetectionPage() {
             <div className="aegis-stat-icon">
               <Zap size={18} strokeWidth={1.6} />
             </div>
-            <span className="aegis-stat-label">Critical Alerts</span>
+            <span className="aegis-stat-label">Critical Alerts{isMockMode ? ' (mock)' : ''}</span>
           </div>
           <div className="aegis-stat-main-row">
             <span className="aegis-stat-value" style={{ color: CRITICAL_SEVERITY_COLOR }}>
@@ -257,7 +237,7 @@ export default function MLDetectionPage() {
         <div className="aegis-card" style={{ marginBottom: '1.5rem' }}>
           <div className="aegis-card-header">
             <div>
-              <h2>Model Performance</h2>
+              <h2>Model Performance{isMockMode ? ' (mock)' : ''}</h2>
               <p className="aegis-card-subtext">
                 Real-time accuracy metrics from active models
               </p>

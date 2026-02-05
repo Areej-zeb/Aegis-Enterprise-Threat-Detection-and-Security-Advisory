@@ -1,126 +1,270 @@
-# 🛡️ Aegis IDS - Intrusion Detection System
+<div align="center">
 
-Enterprise-grade web-based threat detection and security monitoring system with real-time alerts and ML-powered analysis.
+# 🛡️ Aegis IDS
+### Enterprise Threat Detection & Security Advisory System
+
+*Real-time ML-powered intrusion detection with modern web dashboards*
+
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green.svg)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-Frontend-61dafb.svg)](https://reactjs.org)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+</div>
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎯 **Core Capabilities**
+- **Real-time Threat Detection** with ML classification
+- **Multi-Attack Support**: DDoS, Port Scan, Brute Force, SQL Injection
+- **XGBoost Models** with 79% F1-score accuracy
+- **SHAP Explainability** for model transparency
+- **WebSocket Streaming** for sub-second alerts
+
+</td>
+<td width="50%">
+
+### 🖥️ **Dual Dashboard System**
+- **React Dashboard** - Modern, responsive UI
+- **Streamlit Dashboard** - ML monitoring & analytics
+- **5 Interactive Views**: Overview, Live Alerts, Analytics, Explainability, Threat Intel
+- **Auto-refresh** toggle for SOC operations
+
+</td>
+</tr>
+</table>
+
+---
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### 📋 Prerequisites
 
-**Python Version**: Python 3.9+ (tested on 3.10, 3.11, 3.12)
+<table>
+<tr>
+<td><strong>🐍 Python</strong></td>
+<td>3.9+ (tested on 3.10, 3.11, 3.12, 3.13)</td>
+</tr>
+<tr>
+<td><strong>🌐 Node.js</strong></td>
+<td>16+ (for React dashboard)</td>
+</tr>
+<tr>
+<td><strong>💻 OS</strong></td>
+<td>Windows, Linux, macOS, WSL</td>
+</tr>
+</table>
+
+### ⚡ One-Click Setup
 
 ```bash
-# Ubuntu/Debian or WSL Ubuntu
-sudo apt update
-sudo apt install -y python3 python3-pip python3-venv
-
-# Verify Python version (must be 3.9+)
-python3 --version
-
-# For WSL Ubuntu on Windows (first time only)
-wsl --install -d Ubuntu
-```
-
-### Run the Application
-```bash
-# 1. Clone repository
+# 1️⃣ Clone the repository
 git clone https://github.com/Areej-zeb/Aegis-Enterprise-Threat-Detection-and-Security-Advisory.git
 cd Aegis-Enterprise-Threat-Detection-and-Security-Advisory
 
-# 2. Start the application (Backend + Frontend)
-chmod +x start-aegis.sh
-./start-aegis.sh
+# 2️⃣ Run the setup script
+# Linux/macOS/WSL:
+chmod +x start-aegis.sh && ./start-aegis.sh
+
+# Windows:
+start-aegis.bat
 ```
 
-**Access the web dashboard**: http://localhost:5173
+### 🌐 Access Points
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **React Dashboard** | http://localhost:5173 | Modern web interface |
+| **Streamlit Dashboard** | http://localhost:8501 | ML analytics & monitoring |
+| **Backend API** | http://localhost:8000 | REST API endpoints |
+| **API Documentation** | http://localhost:8000/docs | Interactive API docs |
 
 ---
 
-## 📊 Features
+## 🔧 Manual Setup
 
-- **Web-Based Dashboard**: Accessible from any browser
-- **Real-time Threat Detection**: Live monitoring with ML-powered classification
-- **5 Interactive Dashboards**:
-  - 📊 **Overview** - System statistics and alerts summary
-  - 🚨 **Live Alerts** - Real-time feed with auto-refresh toggle
-  - 🧠 **Explainability** - SHAP-based ML model insights
-  - 📈 **Analytics** - Attack trends and performance metrics
-  - 🛡️ **Threat Intel** - AI-powered security recommendations
+<details>
+<summary><strong>🐍 Python Backend Setup</strong></summary>
 
-- **Machine Learning**: XGBoost classifier with 79% F1-score
-- **REST API**: FastAPI backend with OpenAPI documentation
-- **WebSocket Streaming**: Sub-second alert delivery
-- **Attack Types**: DDoS, Port Scan, Brute Force, SQL Injection, Web Attacks, etc.
+```bash
+# 1️⃣ Create virtual environment
+python -m venv venv
+
+# 2️⃣ Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
+
+# 3️⃣ Install dependencies
+pip install -r requirements.txt
+
+# 4️⃣ Set environment variables
+# Windows:
+set PYTHONPATH=%cd%
+set MODE=demo
+# Linux/macOS:
+export PYTHONPATH=$(pwd)
+export MODE=demo
+
+# 5️⃣ Start backend server
+py -m uvicorn backend.ids.serve.app:app --reload --host 0.0.0.0 --port 8000
+```
+
+</details>
+
+<details>
+<summary><strong>⚛️ React Frontend Setup</strong></summary>
+
+```bash
+# 1️⃣ Navigate to React app
+cd frontend_react
+
+# 2️⃣ Install Node.js dependencies
+npm install
+
+# 3️⃣ Start development server
+npm run dev
+```
+
+</details>
+
+<details>
+<summary><strong>📊 Streamlit Dashboard Setup</strong></summary>
+
+```bash
+# 1️⃣ Navigate to Streamlit app
+cd frontend_streamlit
+
+# 2️⃣ Start Streamlit server
+streamlit run aegis_dashboard.py --server.port 8501
+```
+
+</details>
+
+### 🔍 Troubleshooting
+
+<details>
+<summary><strong>Common Issues & Solutions</strong></summary>
+
+| Issue | Solution |
+|-------|----------|
+| **Port already in use** | `pkill -f uvicorn && pkill -f streamlit` |
+| **Module not found** | `pip install -r requirements.txt --force-reinstall` |
+| **Permission denied** | `chmod +x start-aegis.sh` |
+| **Python not found** | Use `py` instead of `python` on Windows |
+| **Virtual env issues** | Delete `venv` folder and recreate |
+
+</details>
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ System Architecture
 
+```mermaid
+graph TB
+    A[🌐 Network Traffic] --> B[📡 FastAPI Backend<br/>Port 8000]
+    B --> C[🧠 XGBoost ML Models]
+    B --> D[📊 React Dashboard<br/>Port 5173]
+    B --> E[📈 Streamlit Dashboard<br/>Port 8501]
+    B --> F[🔌 WebSocket Stream]
+    
+    C --> G[🎯 Threat Detection]
+    C --> H[📋 SHAP Explainability]
+    
+    D --> I[👤 Modern Web UI]
+    E --> J[📊 ML Analytics]
+    
+    style B fill:#e1f5fe
+    style C fill:#f3e5f5
+    style D fill:#e8f5e8
+    style E fill:#fff3e0
 ```
-┌─────────────┐         ┌──────────────┐         ┌─────────────┐
-│   Network   │────────▶│  FastAPI     │────────▶│   React     │
-│   Traffic   │         │  Backend     │  HTTP   │   Web UI    │
-└─────────────┘         │  (Port 8000) │         │ (Port 5173) │
-                        └──────────────┘         └─────────────┘
-                              │                         │
-                              ▼                         ▼
-                        ┌──────────────┐         ┌─────────────┐
-                        │  XGBoost ML  │         │   Browser   │
-                        │    Model     │         │  (Any OS)   │
-                        └──────────────┘         └─────────────┘
-```
 
-**Backend**: FastAPI + Uvicorn (REST API)  
-**Frontend**: React + Vite (Web Dashboard)  
-**ML Model**: XGBoost with SHAP explainability  
-**Access**: Any modern web browser
+### 🔧 Technology Stack
 
-### Current Implementation Status
+<table>
+<tr>
+<td width="33%">
 
-✅ **Implemented (70% of Architecture)**:
-- Live Traffic Capture (Demo Mode)
-- Detection & Analysis Engine (XGBoost ML)
-- Real-time Alerting System
-- Web-based UI Dashboard
-- Storage (In-memory session state)
-- AI-powered threat analysis
+**🔙 Backend**
+- FastAPI + Uvicorn
+- XGBoost ML Models
+- WebSocket Streaming
+- SHAP Explainability
 
-❌ **Future Components (30%)**:
-- Automated Pentest Agent
-- Chatbot Security Advisor
-- Persistent Database (PostgreSQL/TimescaleDB)
+</td>
+<td width="33%">
+
+**🎨 Frontend**
+- React + TypeScript
+- Streamlit Analytics
+- Real-time Updates
+- Responsive Design
+
+</td>
+<td width="33%">
+
+**🤖 ML Pipeline**
+- XGBoost Classifier
+- 79% F1-Score
+- Multi-Attack Detection
+- Feature Engineering
+
+</td>
+</tr>
+</table>
 
 ---
 
 ## 📁 Project Structure
 
 ```
-Aegis/
-├── backend/
+🛡️ Aegis/
+├── 🔙 backend/
 │   └── ids/
 │       ├── serve/
-│       │   ├── app.py           # FastAPI backend
-│       │   └── stream.py        # WebSocket streaming
+│       │   ├── app.py              # 🚀 FastAPI main application
+│       │   ├── detection_service.py # 🎯 ML detection engine
+│       │   └── stream.py           # 🔌 WebSocket streaming
 │       ├── models/
-│       │   └── xgb_baseline.py  # ML model
-│       ├── experiments/
-│       │   └── ids_baseline.md  # Model metrics
-│       └── config.yaml          # IDS configuration
-├── frontend_react/
-│   ├── src/                     # React source code
-│   └── package.json             # Frontend dependencies
-├── seed/
-│   ├── alerts.json              # Demo alert data (20 alerts)
-│   └── shap_example.json        # SHAP explainability data
-├── artifacts/
-│   └── xgb_baseline.joblib      # Trained ML model
-├── datasets/
-│   └── index.yaml               # Dataset tracking
-├── ops/
-│   └── docker-compose.dev.yml   # Docker setup (future)
-├── requirements.txt             # Python dependencies
-├── start-aegis.sh              # Automated startup script
-├── .env.example                # Configuration template
-└── README.md                    # This file
+│       │   ├── xgb_baseline.py     # 🤖 XGBoost model training
+│       │   └── cnn_lstm.py         # 🧠 Deep learning models
+│       └── config.yaml             # ⚙️ System configuration
+├── 🎨 frontend_react/
+│   ├── src/
+│   │   ├── components/             # ⚛️ React components
+│   │   ├── pages/                  # 📄 Dashboard pages
+│   │   ├── hooks/                  # 🪝 Custom React hooks
+│   │   └── theme/                  # 🎨 Design system
+│   └── package.json                # 📦 Node.js dependencies
+├── 📊 frontend_streamlit/
+│   └── aegis_dashboard.py          # 📈 ML analytics dashboard
+├── 🎯 artifacts/
+│   ├── Syn/                        # 🔥 SYN flood models
+│   ├── mitm_arp/                   # 🕵️ MITM detection models
+│   └── baseline_ml_stateful/       # 📊 Ensemble models
+├── 🌱 seed/
+│   ├── alerts.json                 # 🚨 Demo alert data
+│   └── shap_*.json                 # 🔍 SHAP explainability
+├── 📊 evaluation/
+│   ├── phase1_dataset_evaluation.py # 📈 Model metrics
+│   ├── phase2_scenario_evaluation.py # 🎭 Scenario testing
+│   └── phase3_system_evaluation.py  # 🏗️ System performance
+├── 🚀 scripts/
+│   ├── run_backend.sh              # 🔙 Backend launcher
+│   ├── run_frontend.sh             # 🎨 Frontend launcher
+│   └── train_*.sh                  # 🤖 Model training
+├── 📋 requirements.txt             # 🐍 Python dependencies
+├── 🚀 start-aegis.sh              # 🐧 Linux/macOS launcher
+├── 🚀 start-aegis.bat             # 🪟 Windows launcher
+└── 📖 README.md                    # 📚 This documentation
 ```
 
 ---
@@ -205,95 +349,280 @@ In a real enterprise environment:
 
 ---
 
-## 🔒 Security Features
+## 🧠 ML Model Performance
 
-- **Severity Classification**: Critical, High, Medium, Low
-- **Confidence Scoring**: ML-based threat probability (0-1)
-- **Attack Type Detection**: 10+ attack categories
-- **Source IP Tracking**: Automatic threat actor identification
-- **Protocol Analysis**: TCP, UDP, ICMP monitoring
+<div align="center">
 
----
+### 📊 Model Comparison
 
-## 🧠 ML Model Details
+| Model | Macro-F1 | Precision | Recall | ROC-AUC | Status |
+|-------|----------|-----------|--------|---------|--------|
+| Logistic Regression | 0.62 | 0.63 | 0.61 | 0.70 | ⚪ Baseline |
+| Random Forest | 0.75 | 0.76 | 0.74 | 0.81 | 🟡 Good |
+| **XGBoost** | **0.79** | **0.80** | **0.79** | **0.85** | 🟢 **Production** |
 
-| Model | Macro-F1 | Precision | Recall | ROC-AUC |
-|-------|----------|-----------|--------|---------|
-| Logistic Regression | 0.62 | 0.63 | 0.61 | 0.70 |
-| Random Forest | 0.75 | 0.76 | 0.74 | 0.81 |
-| **XGBoost** ✅ | **0.79** | **0.80** | **0.79** | **0.85** |
+</div>
 
-**Top Features** (SHAP values):
+### 🎯 Top Features (SHAP Analysis)
+
+<table>
+<tr>
+<td width="50%">
+
+**🔥 Most Important Features**
 1. `pkt_rate` - Packets per second (0.42)
 2. `syn_ratio` - SYN packet ratio (0.31)
 3. `byte_rate` - Bytes per second (0.25)
 4. `flow_duration` - Connection duration (0.18)
 5. `avg_pkt_size` - Average packet size (0.14)
 
+</td>
+<td width="50%">
+
+**🎭 Attack Types Detected**
+- 🔥 **SYN Flood** - TCP SYN attacks
+- 🕵️ **MITM ARP** - ARP spoofing attacks  
+- 🌐 **DNS Exfiltration** - Data exfiltration via DNS
+- 🚪 **Port Scanning** - Network reconnaissance
+- 💥 **DDoS** - Distributed denial of service
+- 🔓 **Brute Force** - Password attacks
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🔒 Security Features
+
+<div align="center">
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **🚨 Severity Classification** | Critical, High, Medium, Low | ✅ Active |
+| **🎯 Confidence Scoring** | ML-based threat probability (0-1) | ✅ Active |
+| **🔍 Attack Type Detection** | 10+ attack categories | ✅ Active |
+| **🌐 Source IP Tracking** | Automatic threat actor identification | ✅ Active |
+| **📡 Protocol Analysis** | TCP, UDP, ICMP monitoring | ✅ Active |
+| **⚡ Real-time Alerts** | Sub-second detection & notification | ✅ Active |
+
+</div>
+
+---
+
+## 📊 Demo Mode Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎭 **Simulation Capabilities**
+- **Realistic Traffic Patterns** with statistical variation
+- **Multi-Attack Scenarios** across different protocols
+- **Time-based Attack Sequences** for testing
+- **Configurable Alert Rates** (1-3 seconds)
+
+</td>
+<td width="50%">
+
+### 📈 **Analytics & Monitoring**
+- **Live Performance Metrics** with model accuracy
+- **Attack Distribution Charts** by type and severity
+- **Time-series Visualization** of threat patterns
+- **SHAP Explainability** for each detection
+
+</td>
+</tr>
+</table>
+
 ---
 
 ## 🐛 Troubleshooting
 
-### Port already in use
+<details>
+<summary><strong>🔧 Common Issues</strong></summary>
+
+### Port Already in Use
 ```bash
 # Kill existing processes
 pkill -f uvicorn
+pkill -f streamlit
+pkill -f node
+
+# Or on Windows:
+taskkill /f /im python.exe
+taskkill /f /im node.exe
 ```
 
-### Module not found
+### Python/Module Issues
 ```bash
-source venv/bin/activate
+# Reinstall dependencies
+source venv/bin/activate  # Linux/macOS
+# or
+venv\Scripts\activate     # Windows
+
 pip install -r requirements.txt --force-reinstall
 ```
 
-### Permission denied
+### Permission Denied
 ```bash
+# Linux/macOS:
 chmod +x start-aegis.sh
+chmod +x scripts/*.sh
+
+# Windows: Run as Administrator
 ```
 
-### WSL not launching
+### Virtual Environment Issues
+```bash
+# Delete and recreate
+rm -rf venv  # Linux/macOS
+# or
+rmdir /s venv  # Windows
+
+python -m venv venv
+```
+
+### WSL/Ubuntu Setup
 ```powershell
-# In PowerShell
+# In PowerShell (Windows)
+wsl --install -d Ubuntu
 wsl --list --verbose
 
-# If Ubuntu not installed:
-wsl --install -d Ubuntu
-```
-
-### Running in WSL Ubuntu manually
-```bash
-# Open WSL Ubuntu terminal
-wsl
-
-# Navigate to project
-cd /mnt/c/Users/LENOVO/Desktop/Aegis
-
-# Run the script
-chmod +x start-aegis.sh
+# Then in WSL Ubuntu:
+cd /mnt/c/path/to/aegis
 ./start-aegis.sh
 ```
 
+</details>
+
 ---
 
-## 📝 License
+## 🚀 Development
 
-MIT License - See [LICENSE](LICENSE) file
+<details>
+<summary><strong>🛠️ Development Setup</strong></summary>
+
+### Backend Development
+```bash
+# Install development dependencies
+pip install -r requirements.txt
+pip install pytest black flake8
+
+# Run tests
+pytest
+
+# Format code
+black backend/
+
+# Start with hot reload
+uvicorn backend.ids.serve.app:app --reload --port 8000
+```
+
+### Frontend Development
+```bash
+# React development
+cd frontend_react
+npm install
+npm run dev
+
+# Streamlit development
+cd frontend_streamlit
+streamlit run aegis_dashboard.py --server.runOnSave true
+```
+
+### Model Training
+```bash
+# Train all models
+./scripts/train_ids.sh
+
+# Train specific model
+python backend/ids/models/xgb_baseline.py
+```
+
+</details>
+
+---
+
+## 📈 Roadmap
+
+<table>
+<tr>
+<td width="50%">
+
+### ✅ **Completed**
+- [x] Real-time ML detection engine
+- [x] Dual dashboard system (React + Streamlit)
+- [x] WebSocket streaming
+- [x] SHAP explainability
+- [x] Multi-attack type support
+- [x] Demo mode with realistic data
+
+</td>
+<td width="50%">
+
+### 🔄 **In Progress**
+- [ ] Database persistence (PostgreSQL)
+- [ ] User authentication & RBAC
+- [ ] Alert correlation engine
+- [ ] Custom rule engine
+- [ ] Mobile-responsive design
+- [ ] Docker containerization
+
+</td>
+</tr>
+</table>
+
+### 🎯 **Future Enhancements**
+- **🤖 Automated Penetration Testing** - AI-driven security assessment
+- **💬 Security Chatbot** - Natural language threat analysis
+- **📊 Advanced Analytics** - Predictive threat modeling
+- **🔗 SIEM Integration** - Enterprise security platform connectivity
+
+---
+
+## 📄 License
+
+```
+MIT License - See LICENSE file for details
+```
 
 ---
 
 ## 👥 Contributors
 
-**Areej Zeb** - [GitHub](https://github.com/Areej-zeb)
+<div align="center">
+
+**🛡️ Areej Zeb** - *Lead Developer*  
+[![GitHub](https://img.shields.io/badge/GitHub-Areej--zeb-black.svg)](https://github.com/Areej-zeb)
+
+*Contributions welcome! Please read our contributing guidelines.*
+
+</div>
 
 ---
 
 ## 🙏 Acknowledgments
 
-- XGBoost for ML framework
-- React & Vite for dashboard
-- FastAPI for backend API
-- SHAP for model explainability
+<div align="center">
+
+**Built with ❤️ for cybersecurity professionals**
+
+[![XGBoost](https://img.shields.io/badge/XGBoost-ML%20Framework-orange.svg)](https://xgboost.readthedocs.io)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green.svg)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-Frontend-blue.svg)](https://reactjs.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Analytics-red.svg)](https://streamlit.io)
+
+*Special thanks to the open-source community for making this project possible.*
+
+</div>
 
 ---
 
-**Made with ❤️ for cybersecurity professionals**
+<div align="center">
+
+### 🌟 Star this repository if you find it useful!
+
+*Help us improve Aegis IDS by reporting issues and suggesting features.*
+
+</div>

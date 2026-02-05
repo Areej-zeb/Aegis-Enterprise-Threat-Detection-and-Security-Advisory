@@ -1,6 +1,6 @@
 // src/pages/IDSPage.jsx
 
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   RadioTower,
   ChartPie,
@@ -24,13 +24,13 @@ import {
   getMetricsOverview,
   getSystemStatus,
   fetchAlerts,
-  getExplanation,
   checkHealth
 } from "../api/aegisClient.ts";
 import RecentAlertTrends from "../components/RecentAlertTrends.tsx";
 import ExplainabilityPanel from "../components/ids/ExplainabilityPanel.tsx";
 import MetricsSummaryCard from "../components/cards/MetricsSummaryCard.tsx";
-import { SeverityBadge } from "../components/common";
+import { SeverityBadge, StatusPill } from "../components/common";
+import Card from "../components/common/Card.jsx";
 import { useIdsAnalytics } from "../hooks/useIdsAnalytics.ts";
 import { IdsAnalyticsKpiRow } from "../components/ids/analytics/IdsAnalyticsKpiRow.tsx";
 import { AlertsOverTimeChart } from "../components/ids/analytics/AlertsOverTimeChart.tsx";
@@ -38,6 +38,8 @@ import { AttackTypeDistribution } from "../components/ids/analytics/AttackTypeDi
 import { SeverityBreakdownChart } from "../components/ids/analytics/SeverityBreakdownChart.tsx";
 import { TopTalkersTable } from "../components/ids/analytics/TopTalkersTable.tsx";
 import { TimeRangeSelector } from "../components/ids/analytics/TimeRangeSelector.tsx";
+import { useSystemStatus } from '../hooks/useSystemStatus';
+import { generateMetricsOverview, generateRecentAlerts } from '../utils/mockDataGenerator';
 
 // --- Demo data (fallback for when API is unavailable) ----------------------
 
@@ -183,64 +185,59 @@ function AnalyticsTabContent({ alerts, loading, error }) {
 
       {/* Row 2: Volume & Mix */}
       <div style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-        {/* Alerts Over Time */}
-        <div className="aegis-card">
-          <div className="aegis-card-header">
+        {/* Alerts Over Time (migrated to Card) */}
+        <Card header={(
+          <>
             <h2>Alerts Over Time</h2>
-            <span className="aegis-card-subtitle">
-              Stacked by severity (last {timeRange})
-            </span>
-          </div>
+            <span className="aegis-card-subtitle">Stacked by severity (last {timeRange})</span>
+          </>
+        )}>
           <AlertsOverTimeChart data={analytics.alertsOverTime} />
-        </div>
+        </Card>
 
         {/* Attack Type Distribution */}
-        <div className="aegis-card">
-          <div className="aegis-card-header">
+        <Card header={(
+          <>
             <h2>Attack Type Distribution</h2>
-            <span className="aegis-card-subtitle">
-              Share of detections by attack type
-            </span>
-          </div>
+            <span className="aegis-card-subtitle">Share of detections by attack type</span>
+          </>
+        )}>
           <AttackTypeDistribution attackCounts={analytics.attackCounts} />
-        </div>
+        </Card>
       </div>
 
       {/* Row 3: Severity & Top Talkers */}
       <div style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
         {/* Severity Breakdown */}
-        <div className="aegis-card">
-          <div className="aegis-card-header">
+        <Card header={(
+          <>
             <h2>Severity Breakdown</h2>
-            <span className="aegis-card-subtitle">
-              Alert distribution by severity level
-            </span>
-          </div>
+            <span className="aegis-card-subtitle">Alert distribution by severity level</span>
+          </>
+        )}>
           <SeverityBreakdownChart severityCounts={analytics.severityCounts} />
-        </div>
+        </Card>
 
         {/* Top Talkers */}
-        <div className="aegis-card">
-          <div className="aegis-card-header">
+        <Card header={(
+          <>
             <h2>Top Talkers</h2>
-            <span className="aegis-card-subtitle">
-              Most active source IPs
-            </span>
-          </div>
+            <span className="aegis-card-subtitle">Most active source IPs</span>
+          </>
+        )}>
           <TopTalkersTable topSources={analytics.topSources} />
-        </div>
+        </Card>
       </div>
 
       {/* Row 4: Model Overview (if available) */}
       {analytics.modelCounts.length > 0 && (
         <div style={{ gridColumn: '1 / -1' }}>
-          <div className="aegis-card">
-            <div className="aegis-card-header">
+          <Card header={(
+            <>
               <h2>Detections by Model</h2>
-              <span className="aegis-card-subtitle">
-                Alert distribution across ML models
-              </span>
-            </div>
+              <span className="aegis-card-subtitle">Alert distribution across ML models</span>
+            </>
+          )}>
             <div className="ids-table-wrapper">
               <table className="ids-table">
                 <thead>
@@ -268,7 +265,7 @@ function AnalyticsTabContent({ alerts, loading, error }) {
                 </tbody>
               </table>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </section>
@@ -283,10 +280,9 @@ function IDSPage() {
 
   // API state
   const [metrics, setMetrics] = useState(null);
-  const [systemStatus, setSystemStatus] = useState(null);
+  const { systemStatus } = useSystemStatus();
   const [healthStatus, setHealthStatus] = useState(null);
   const [alerts, setAlerts] = useState([]);
-  const [alertsPagination, setAlertsPagination] = useState(null);
   const [selectedAlertId, setSelectedAlertId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -304,43 +300,43 @@ function IDSPage() {
         setLoading(true);
         setError(null);
 
-        const [metricsData, statusData, healthData] = await Promise.all([
-          getMetricsOverview(),
-          getSystemStatus(),
-          checkHealth().catch(() => null)
-        ]);
-
-        console.log('[Overview/Analytics] Data received:', {
-          metrics: metricsData,
-          status: statusData,
-          health: healthData
-        });
-
-        // Validate metrics has required data
-        if (metricsData && (metricsData.attack_counts || metricsData.total_detections >= 0)) {
-          setMetrics(metricsData);
-          console.log('[Overview/Analytics] Metrics set successfully');
+        // CHECK: If mock is ON, use mock data instead of API
+        if (systemStatus.mockStream === 'ON') {
+          console.log('[Overview/Analytics] Using mock data (Mock: ON)');
+          // Use mock data utilities for consistent data
+          const mockMetrics = generateMetricsOverview();
+          setMetrics(mockMetrics);
+          setHealthStatus({ status: 'healthy', components: { database: 'demo' } });
         } else {
-          console.warn('[Overview/Analytics] Metrics data is empty or invalid:', metricsData);
-          setError('No metrics data available from backend');
+          // Original API calls
+          const [metricsData, , healthData] = await Promise.all([
+            getMetricsOverview(),
+            getSystemStatus(),
+            checkHealth().catch(() => null)
+          ]);
+          setMetrics(metricsData);
+          setHealthStatus(healthData);
         }
         
-        setSystemStatus(statusData);
-        setHealthStatus(healthData);
         setInitialLoadComplete(true);
-        console.log('[Overview/Analytics] State updated, initialLoadComplete=true');
       } catch (err) {
-        const errorMsg = err.message || 'Failed to connect to ML detection service';
-        setError(errorMsg);
-        console.error('[Overview/Analytics] Error:', err);
+        // If API fails but mock is ON, still use mock data
+        if (systemStatus.mockStream === 'ON') {
+          console.log('[Overview/Analytics] API failed, using mock fallback');
+          // Set mock data as fallback
+          const mockMetrics = generateMetricsOverview();
+          setMetrics(mockMetrics);
+          setHealthStatus({ status: 'healthy', components: { database: 'demo' } });
+        } else {
+          setError(err.message || 'Failed to connect to ML detection service');
+        }
       } finally {
         setLoading(false);
-        console.log('[Overview/Analytics] Loading complete');
       }
     }
 
     loadOverviewData();
-  }, [activeTab]);
+  }, [activeTab, systemStatus.mockStream]);
 
   // Load Live Alerts data
   useEffect(() => {
@@ -352,44 +348,75 @@ function IDSPage() {
         setLoading(true);
         setError(null);
 
-        const response = await fetchAlerts({
-          page: 1,
-          page_size: 20,
-          ...(severityFilter !== "all" && { severity: severityFilter })
-        });
-
-        console.log('[Live Alerts] Response received:', response);
-        
-        const alertsData = response.alerts || [];
-        console.log('[Live Alerts] Alerts count:', alertsData.length);
-        
-        if (alertsData.length > 0) {
+        // CHECK: If mock is ON, use mock data
+        if (systemStatus.mockStream === 'ON') {
+          console.log('[Live Alerts] Using mock alerts (Mock: ON)');
+          const mockAlertsData = generateRecentAlerts(20);
+          // Transform to match expected format
+          const transformedMockAlerts = mockAlertsData.map(alert => ({
+            id: alert.id,
+            timestamp: alert.timestamp,
+            srcIp: alert.src_ip,
+            destIp: alert.dst_ip,
+            protocol: "TCP",
+            label: alert.attack_type,
+            score: alert.score,
+            severity: alert.severity,
+            sensor: "Mock Sensor",
+            srcPort: Math.floor(Math.random() * 65535),
+            destPort: Math.floor(Math.random() * 65535),
+            type: alert.attack_type,
+          }));
+          setAlerts(transformedMockAlerts);
+          if (!selectedAlertId && mockAlerts.length > 0) {
+            setSelectedAlertId(mockAlerts[0].id);
+          }
+        } else {
+          // Original API call
+          const response = await fetchAlerts({
+            page: 1,
+            page_size: 20,
+            ...(severityFilter !== "all" && { severity: severityFilter })
+          });
+          
+          const alertsData = response.alerts || [];
           setAlerts(alertsData);
-          setAlertsPagination(response.meta);
-          if (!selectedAlertId) {
+          if (!selectedAlertId && alertsData.length > 0) {
             setSelectedAlertId(alertsData[0].id);
           }
-          console.log('[Live Alerts] Alerts set successfully');
-        } else {
-          console.warn('[Live Alerts] No alerts received from backend');
-          setAlerts([]);
-          setError('No alerts available. The ML models may not be generating detections.');
         }
         
         setInitialLoadComplete(true);
-        console.log('[Live Alerts] State updated, initialLoadComplete=true');
       } catch (err) {
-        const errorMsg = err.message || 'Failed to load alerts from ML models';
-        console.error('[Live Alerts] Error:', err);
-        setError(errorMsg);
-        // Keep existing alerts on error rather than clearing
+        // If API fails but mock is ON, still use mock data
+        if (systemStatus.mockStream === 'ON') {
+          console.log('[Live Alerts] API failed, using mock fallback');
+          const mockAlertsData = generateRecentAlerts(20);
+          const transformedMockAlerts = mockAlertsData.map(alert => ({
+            id: alert.id,
+            timestamp: alert.timestamp,
+            srcIp: alert.src_ip,
+            destIp: alert.dst_ip,
+            protocol: "TCP",
+            label: alert.attack_type,
+            score: alert.score,
+            severity: alert.severity,
+            sensor: "Mock Sensor",
+            srcPort: Math.floor(Math.random() * 65535),
+            destPort: Math.floor(Math.random() * 65535),
+            type: alert.attack_type,
+          }));
+          setAlerts(transformedMockAlerts);
+        } else {
+          setError(err.message || 'Failed to load alerts from ML models');
+        }
       } finally {
         setLoading(false);
       }
     }
 
     loadAlerts();
-  }, [activeTab, severityFilter]);
+  }, [activeTab, severityFilter, systemStatus.mockStream, selectedAlertId]);
 
   // Polling for Live Alerts
   useEffect(() => {
@@ -404,7 +431,6 @@ function IDSPage() {
         });
 
         setAlerts(response.alerts);
-        setAlertsPagination(response.meta);
       } catch (err) {
         console.error('Polling error:', err);
       }
@@ -528,13 +554,12 @@ function IDSPage() {
   const handleDashboardRefresh = async () => {
     setIsRefreshing(true);
     try {
-      const [metricsData, statusData, healthData] = await Promise.all([
+      const [metricsData, , healthData] = await Promise.all([
         getMetricsOverview(),
         getSystemStatus(),
         checkHealth().catch(() => null)
       ]);
       setMetrics(metricsData);
-      setSystemStatus(statusData);
       setHealthStatus(healthData);
       
       // Also refresh alerts if on live-alerts tab
@@ -545,7 +570,6 @@ function IDSPage() {
           ...(severityFilter !== "all" && { severity: severityFilter })
         });
         setAlerts(response.alerts);
-        setAlertsPagination(response.meta);
       }
     } catch (err) {
       console.error('Refresh failed:', err);
@@ -572,8 +596,6 @@ function IDSPage() {
   };
 
   const idsStatus = getIDSStatus();
-  const backendMode = healthStatus?.mode || (healthStatus?.components?.database);
-  const environmentLabel = (backendMode === 'demo' || backendMode === 'static') ? 'Demo' : 'ML Models Active';
 
   return (
     <div className="aegis-page">
@@ -589,32 +611,8 @@ function IDSPage() {
           </p>
         </div>
         <div className="ids-header-right-new">
-          {/* Status pill */}
-          <div className={`ids-status-pill-neon ids-status-pill-neon--${
-            idsStatus.status === 'error' ? 'error' : 
-            idsStatus.status === 'warning' ? 'warning' : 
-            'healthy'
-          }`}>
-            <Circle
-              className={`ids-status-dot-icon ${
-                idsStatus.status === 'error' ? 'ids-status-dot-icon--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-dot-icon--warning' : 
-                'ids-status-dot-icon--healthy'
-              }`}
-              fill="currentColor"
-            />
-            <span className="ids-status-text">
-              Env: <span className="ids-status-value">{environmentLabel}</span>
-            </span>
-            <span className="ids-status-separator">•</span>
-            <span className="ids-status-text">
-              IDS: <span className={`ids-status-value ${
-                idsStatus.status === 'error' ? 'ids-status-value--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-value--warning' : 
-                'ids-status-value--healthy'
-              }`}>{idsStatus.label}</span>
-            </span>
-          </div>
+          {/* Unified Status pill */}
+          <StatusPill />
 
           {/* Refresh button */}
           <button
@@ -701,13 +699,12 @@ function IDSPage() {
             </div>
 
             {/* Security Overview */}
-            <div className="aegis-card">
-              <div className="aegis-card-header">
+            <Card header={(
+              <>
                 <h2>Security Overview</h2>
-                <span className="aegis-card-subtitle">
-                  Last 5 min snapshot
-                </span>
-              </div>
+                <span className="aegis-card-subtitle">Last 5 min snapshot</span>
+              </>
+            )}>
               <div className="ids-kpi-grid">
                 <div className="ids-kpi-card">
                   <div className="ids-kpi-label">Total Alerts</div>
@@ -757,29 +754,27 @@ function IDSPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Right column: Distributions */}
           <div className="ids-overview-right">
             {/* Recent Alert Trends */}
-            <div className="aegis-card" style={{ minHeight: "400px" }}>
-              <div className="aegis-card-header">
+            <Card style={{ minHeight: "400px" }} header={(
+              <>
                 <h2>Recent Alert Trends (Last 50 Alerts)</h2>
-                <span className="aegis-card-subtitle">
-                  Severity distribution across the most recent alerts
-                </span>
-              </div>
+                <span className="aegis-card-subtitle">Severity distribution across the most recent alerts</span>
+              </>
+            )}>
               <RecentAlertTrends alerts={alerts} />
-            </div>
+            </Card>
 
-            <div className="aegis-card">
-              <div className="aegis-card-header">
+            <Card header={(
+              <>
                 <h2>Distributions</h2>
-                <span className="aegis-card-subtitle">
-                  Based on active alerts
-                </span>
-              </div>
+                <span className="aegis-card-subtitle">Based on active alerts</span>
+              </>
+            )}>
               <div className="ids-dist-grid-new">
                 {/* Attack Type Distribution */}
                 <div className="ids-dist-section">
@@ -860,7 +855,7 @@ function IDSPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </section>
       )}
@@ -871,7 +866,7 @@ function IDSPage() {
           {/* Left column */}
           <div className="ids-left-stack">
             {/* Streaming toolbar */}
-            <div className="aegis-card">
+            <Card>
               <div className="ids-live-toolbar">
                 <div className="ids-live-left">
                   <div className="ids-live-status">
@@ -916,10 +911,10 @@ function IDSPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </Card>
 
             {/* Alerts feed */}
-            <div className="aegis-card">
+            <Card>
               <div className="aegis-card-header">
                 <div>
                   <h2>Live Alerts Feed</h2>
@@ -1097,7 +1092,7 @@ function IDSPage() {
                 )}
               </div>
 
-            </div>
+            </Card>
           </div>
 
           {/* Right column */}
@@ -1220,7 +1215,7 @@ function IDSPage() {
             <ExplainabilityPanel detectionId={selectedAlert?.id || null} />
 
             {/* AI Advisory Insight */}
-            <div className="aegis-card ids-advisory-card">
+            <Card className="ids-advisory-card">
               <div className="ids-advisory-header">
                 <div className="ids-advisory-icon-wrap">
                   <Zap size={18} />
@@ -1249,7 +1244,7 @@ function IDSPage() {
                   SIEM correlation rules.
                 </li>
               </ul>
-            </div>
+            </Card>
           </div>
         </section>
       )}
@@ -1261,10 +1256,11 @@ function IDSPage() {
       {activeTab === "threat-intel" && (
         <section className="ids-intel-grid">
           {/* AI powered threat analysis */}
-          <div className="aegis-card">
-            <div className="aegis-card-header">
+          <Card header={(
+            <>
               <h2>AI-Powered Threat Analysis</h2>
-            </div>
+            </>
+          )}>
             <div className="ids-intel-grid-mini">
               <div className="ids-intel-card">
                 <p className="ids-intel-card-label">Most prevalent attack</p>
@@ -1291,13 +1287,14 @@ function IDSPage() {
                 </p>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Recommended actions */}
-          <div className="aegis-card">
-            <div className="aegis-card-header">
+          <Card header={(
+            <>
               <h2>Recommended Security Actions</h2>
-            </div>
+            </>
+          )}>
             <ul className="ids-intel-list">
               <li>
                 <span className="ids-intel-dot ids-intel-dot--purple" />
@@ -1320,16 +1317,15 @@ function IDSPage() {
                 suspicious long-lived flows.
               </li>
             </ul>
-          </div>
+            </Card>
 
           {/* Known malicious IPs */}
-          <div className="aegis-card">
-            <div className="aegis-card-header">
+          <Card header={(
+            <>
               <h2>Known Malicious IPs (Demo)</h2>
-              <span className="aegis-card-subtitle">
-                Ready to integrate AbuseIPDB / external feeds
-              </span>
-            </div>
+              <span className="aegis-card-subtitle">Ready to integrate AbuseIPDB / external feeds</span>
+            </>
+          )}>
             <table className="ids-metrics-table">
               <thead>
                 <tr>
@@ -1374,13 +1370,14 @@ function IDSPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
 
           {/* MITRE / CVEs */}
-          <div className="aegis-card">
-            <div className="aegis-card-header">
+          <Card header={(
+            <>
               <h2>Attack Signatures & MITRE ATT&CK</h2>
-            </div>
+            </>
+          )}>
             <ul className="ids-intel-list">
               <li>
                 <span className="ids-intel-dot ids-intel-dot--purple" />
@@ -1403,7 +1400,7 @@ function IDSPage() {
                 <code>T1046</code> (Network Service Discovery).
               </li>
             </ul>
-          </div>
+          </Card>
         </section>
       )}
     </div>

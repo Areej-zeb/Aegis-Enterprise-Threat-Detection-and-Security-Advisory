@@ -1,38 +1,68 @@
 import React, { useEffect, useState, useCallback } from "react";
 import "../index.css";
-import { Activity, Gauge, Server, AlertTriangle, Heart, Shield, Target, TrendingUp, RefreshCcw, RotateCw, Circle } from "lucide-react";
+import "./SettingsPage.css";
+import { Activity, Gauge, Server, AlertTriangle, Heart, Shield, Target, TrendingUp, RefreshCcw, RotateCw, Circle, Zap } from "lucide-react";
 import { getMetricsOverview, getSystemStatus, checkHealth } from "../api/aegisClient.ts";
-import { StatCard } from "../components/common";
+import { StatCard, StatusPill } from "../components/common";
+import { useSystemStatus } from "../hooks/useSystemStatus.ts";
+import { generateMetricsOverview } from "../utils/mockDataGenerator.ts";
 
 function OverviewPage() {
   const [metrics, setMetrics] = useState(null);
-  const [systemStatus, setSystemStatus] = useState(null);
   const [healthStatus, setHealthStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Get system status for mock mode detection
+  const { systemStatus } = useSystemStatus();
+  const isMockMode = systemStatus.mockStream === 'ON';
+
+  useEffect(() => {
+    // Removed showMockButton handler
+  }, []);
 
   const loadOverview = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const [metricsData, systemStatusData, healthData] = await Promise.all([
-        getMetricsOverview(),
-        getSystemStatus(),
-        checkHealth().catch(() => null), // Don't fail if health check fails
-      ]);
+      // CHECK: If mock is ON, use mock data instead of API
+      if (systemStatus.mockStream === 'ON') {
+        console.log('[Overview] Using mock data (Mock: ON)');
+        const mockMetrics = generateMetricsOverview();
+        setMetrics(mockMetrics);
+        setHealthStatus({ status: 'healthy', components: { database: 'demo' } });
+        return;
+      }
 
-      setMetrics(metricsData);
-      setSystemStatus(systemStatusData);
-      setHealthStatus(healthData);
+      try {
+        const [metricsData, , healthData] = await Promise.all([
+          getMetricsOverview(),
+          getSystemStatus(),
+          checkHealth().catch(() => null), // Don't fail if health check fails
+        ]);
+
+        setMetrics(metricsData);
+        setHealthStatus(healthData);
+      } catch (apiErr) {
+        // If API fails but mock is ON, still use mock data
+        if (systemStatus.mockStream === 'ON') {
+          console.log('[Overview] API failed, using mock fallback');
+          const mockMetrics = generateMetricsOverview();
+          setMetrics(mockMetrics);
+          setHealthStatus({ status: 'healthy', components: { database: 'demo' } });
+        } else {
+          throw apiErr;
+        }
+      }
     } catch (err) {
       setError(err.message || "Failed to load overview data");
       console.error("Failed to load overview data:", err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [systemStatus.mockStream]);
 
   useEffect(() => {
     loadOverview();
@@ -70,8 +100,6 @@ function OverviewPage() {
 
   const idsStatus = getIDSStatus();
   // Check backend mode
-  const backendMode = healthStatus?.mode || (healthStatus?.components?.database);
-  const environmentLabel = (backendMode === 'demo' || backendMode === 'static') ? 'Demo' : 'Production';
 
   return (
     <div className="aegis-page">
@@ -83,32 +111,8 @@ function OverviewPage() {
           </p>
         </div>
         <div className="ids-header-right-new">
-          {/* Status pill */}
-          <div className={`ids-status-pill-neon ids-status-pill-neon--${
-            idsStatus.status === 'error' ? 'error' : 
-            idsStatus.status === 'warning' ? 'warning' : 
-            'healthy'
-          }`}>
-            <Circle
-              className={`ids-status-dot-icon ${
-                idsStatus.status === 'error' ? 'ids-status-dot-icon--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-dot-icon--warning' : 
-                'ids-status-dot-icon--healthy'
-              }`}
-              fill="currentColor"
-            />
-            <span className="ids-status-text">
-              Env: <span className="ids-status-value">{environmentLabel}</span>
-            </span>
-            <span className="ids-status-separator">•</span>
-            <span className="ids-status-text">
-              IDS: <span className={`ids-status-value ${
-                idsStatus.status === 'error' ? 'ids-status-value--error' : 
-                idsStatus.status === 'warning' ? 'ids-status-value--warning' : 
-                'ids-status-value--healthy'
-              }`}>{idsStatus.label}</span>
-            </span>
-          </div>
+          {/* Unified Status pill */}
+          <StatusPill />
 
           {/* Refresh button */}
           <button
@@ -198,7 +202,7 @@ function OverviewPage() {
         <div className="aegis-dash-left-col">
           <div className="aegis-card">
             <div className="aegis-card-header">
-              <h2>System Status</h2>
+              <h2>System Status{isMockMode ? ' (mock)' : ''}</h2>
               <span className="aegis-card-subtitle">
                 Raw information returned from the Aegis API.
               </span>
@@ -229,7 +233,7 @@ function OverviewPage() {
         <div className="aegis-dash-right-col">
           <div className="aegis-card">
             <div className="aegis-card-header">
-              <h2>Metrics Summary</h2>
+              <h2>Metrics Summary{isMockMode ? ' (mock)' : ''}</h2>
               <span className="aegis-card-subtitle">
                 Attack and severity counts from the metrics overview endpoint.
               </span>

@@ -17,7 +17,7 @@ function DetectionPage() {
     if (metadata.trim()) {
       try {
         parsedMetadata = JSON.parse(metadata);
-      } catch (err) {
+      } catch {
         setError("Metadata must be valid JSON.");
         return;
       }

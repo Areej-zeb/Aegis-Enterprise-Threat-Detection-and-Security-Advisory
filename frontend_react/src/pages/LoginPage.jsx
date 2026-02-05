@@ -60,6 +60,7 @@ function LoginPage() {
       title="Welcome back to AEGIS"
       subtitle="Log in to access your dashboard"
     >
+      <StatusBar env="Demo" ids="Healthy" />
       <form className="aegis-auth-form" onSubmit={handleSubmit}>
         {error && (
           <div style={{

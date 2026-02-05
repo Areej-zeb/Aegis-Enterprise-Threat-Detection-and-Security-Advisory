@@ -1,39 +1,99 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "../index.css";
-import { LineChart, BarChart3 } from "lucide-react";
-import { getMetricsOverview } from "../api/aegisClient.ts";
+import "./SettingsPage.css";
+import { LineChart, BarChart3, Activity, Gauge, Server, AlertTriangle, Heart, Shield, Target, TrendingUp, RefreshCcw, RotateCw, Circle, Zap } from "lucide-react";
+import { getMetricsOverview, checkHealth } from "../api/aegisClient.ts";
 import { generateMetricsOverview, generateMonthlyThreats } from "../utils/mockDataGenerator.ts";
 import ThreatsDetectedCard from "../components/charts/ThreatsDetectedCard.tsx";
+import { StatCard, StatusPill } from "../components/common";
+import { useSystemStatus } from "../hooks/useSystemStatus.ts";
 
 function MetricsPage() {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [healthStatus, setHealthStatus] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Get system status for mock mode detection
+  const { systemStatus } = useSystemStatus();
+  const isMockMode = systemStatus.mockStream === 'ON';
 
   useEffect(() => {
-    async function loadMetrics() {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        try {
-          const data = await getMetricsOverview();
-          setMetrics(data);
-        } catch (apiErr) {
-          // Fall back to mock data
-          const mockData = generateMetricsOverview();
-          setMetrics(mockData);
-        }
-      } catch (err) {
-        console.error("Failed to load metrics overview:", err);
-        setError(err.message || "Failed to load metrics");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadMetrics();
+    // Remove the undefined setShowMockButton calls
   }, []);
+
+  const loadMetrics = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // CHECK: If mock is ON, use mock data instead of API
+      if (systemStatus.mockStream === 'ON') {
+        console.log('[Metrics] Using mock data (Mock: ON)');
+        const mockMetrics = generateMetricsOverview();
+        setMetrics(mockMetrics);
+        setHealthStatus({ status: 'healthy', components: { database: 'demo' } });
+        return;
+      }
+
+      try {
+        const [metricsData, healthData] = await Promise.all([
+          getMetricsOverview(),
+          checkHealth().catch(() => null),
+        ]);
+
+        setMetrics(metricsData);
+        setHealthStatus(healthData);
+      } catch (apiErr) {
+        // If API fails but mock is ON, still use mock data
+        if (systemStatus.mockStream === 'ON') {
+          console.log('[Metrics] API failed, using mock fallback');
+          const mockMetrics = generateMetricsOverview();
+          setMetrics(mockMetrics);
+          setHealthStatus({ status: 'healthy', components: { database: 'demo' } });
+        } else {
+          throw apiErr;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load metrics overview:", err);
+      setError(err.message || "Failed to load metrics");
+    } finally {
+      setLoading(false);
+    }
+  }, [systemStatus.mockStream]);
+
+  useEffect(() => {
+    loadMetrics();
+  }, [loadMetrics]);
+
+  const handleDashboardRefresh = async () => {
+    setIsRefreshing(true);
+    await loadMetrics();
+    setIsRefreshing(false);
+  };
+
+  // Mock stream toggle - removed due to undefined variables
+
+  // Determine IDS status
+  const getIDSStatus = () => {
+    if (loading && !healthStatus) {
+      return { status: 'loading', label: 'Checking' };
+    }
+    if (error || !healthStatus) {
+      return { status: 'error', label: 'Error' };
+    }
+    if (healthStatus.status === 'healthy' || healthStatus.status === 'ok') {
+      return { status: 'healthy', label: 'Healthy' };
+    }
+    if (healthStatus.status === 'degraded' || healthStatus.status === 'warning') {
+      return { status: 'warning', label: 'Warning' };
+    }
+    return { status: 'error', label: 'Error' };
+  };
+
+  const idsStatus = getIDSStatus();
 
   return (
     <div className="aegis-page">
@@ -44,6 +104,16 @@ function MetricsPage() {
             High-level attack and severity metrics from the Aegis backend, with a
             placeholder for time-series charts.
           </p>
+        </div>
+        <div className="ids-header-right-new">
+          {/* Unified Status pill */}
+          <StatusPill />
+
+          {/* Refresh button */}
+          <button type="button" onClick={handleDashboardRefresh} disabled={isRefreshing} className={`ids-refresh-btn-neon ids-refresh-btn-neon--${idsStatus.status === 'error' ? 'error' : idsStatus.status === 'warning' ? 'warning' : 'healthy'}`}>
+            <RotateCw className={`ids-refresh-icon ${isRefreshing ? 'animate-spin-slow' : ''}`} />
+            <span>Refresh</span>
+          </button>
         </div>
       </header>
 
@@ -64,7 +134,7 @@ function MetricsPage() {
       <section className="ids-analytics-grid">
         <div className="aegis-card">
           <div className="aegis-card-header">
-            <h2>Summary</h2>
+            <h2>Summary{isMockMode ? ' (mock)' : ''}</h2>
             <span className="aegis-card-subtitle">
               Totals from the `/metrics/overview` endpoint.
             </span>
@@ -104,7 +174,7 @@ function MetricsPage() {
 
         <div className="aegis-card">
           <div className="aegis-card-header">
-            <h2>Attack Counts</h2>
+            <h2>Attack Counts{isMockMode ? ' (mock)' : ''}</h2>
             <span className="aegis-card-subtitle">
               Total detections by attack type.
             </span>
@@ -143,7 +213,7 @@ function MetricsPage() {
 
         <div className="aegis-card">
           <div className="aegis-card-header">
-            <h2>Severity Counts</h2>
+            <h2>Severity Counts{isMockMode ? ' (mock)' : ''}</h2>
             <span className="aegis-card-subtitle">
               Total detections by severity.
             </span>
