@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   { key: "ml-detection", label: "ML Detection", path: "/ml-detection", Icon: Activity },
   { key: "ids", label: "IDS Alerts", path: "/ids", Icon: ShieldAlert },
   { key: "pentesting", label: "Pentesting", path: "/pentest", Icon: Shield },
-  { key: "advisor", label: "Advisor Chatbot", path: "/advisor-404", Icon: Bot },
+  { key: "chatbot", label: "Security Assistant", path: "/chatbot", Icon: Bot },
   { key: "settings", label: "Settings", path: "/settings", Icon: Settings },
 ];
 

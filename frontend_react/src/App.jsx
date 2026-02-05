@@ -8,6 +8,7 @@ import IDSPage from "./pages/IDSPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import MLDetectionPage from "./pages/MLDetectionPage";
+import ChatbotPage from "./pages/ChatbotPage";
 import AppShell from "./components/layout/AppShell";
 import { AlertTimeSeriesProvider } from "./state/AlertTimeSeriesContext";
 import RequireAuth from "./routes/RequireAuth";
@@ -147,6 +148,14 @@ function App() {
             element={
               <AppShell>
                 <PentestPage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/chatbot"
+            element={
+              <AppShell>
+                <ChatbotPage />
               </AppShell>
             }
           />
