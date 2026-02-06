@@ -1,4 +1,4 @@
-"""
+﻿"""
 Aegis IDS - Real-time Detection Service
 Loads ML models and generates live predictions from test datasets
 """
@@ -64,7 +64,7 @@ class DetectionService:
                     'classes': syn_dict['label_encoder'].classes_.tolist(),
                     'type': 'xgboost'
                 }
-                print(f"✅ Loaded SYN model: {len(self.models['Syn']['classes'])} classes")
+                print(f"âœ… Loaded SYN model: {len(self.models['Syn']['classes'])} classes")
                 self.system_logger.info(f"Loaded SYN model with {len(self.models['Syn']['classes'])} classes from {syn_path}")
                 models_loaded.append('SYN')
             else:
@@ -80,7 +80,7 @@ class DetectionService:
                     'classes': mitm_dict['label_encoder'].classes_.tolist(),
                     'type': 'xgboost'
                 }
-                print(f"✅ Loaded MITM model: {len(self.models['mitm_arp']['classes'])} classes")
+                print(f"âœ… Loaded MITM model: {len(self.models['mitm_arp']['classes'])} classes")
                 self.system_logger.info(f"Loaded MITM model with {len(self.models['mitm_arp']['classes'])} classes from {mitm_path}")
                 models_loaded.append('MITM')
             else:
@@ -96,7 +96,7 @@ class DetectionService:
                     'classes': ['BENIGN', 'ATTACK'],  # Binary classification
                     'type': 'ensemble'
                 }
-                print(f"✅ Loaded DNS model: binary classification")
+                print(f"âœ… Loaded DNS model: binary classification")
                 self.system_logger.info(f"Loaded DNS model (binary classification) from {dns_path}")
                 models_loaded.append('DNS')
             else:
@@ -133,7 +133,7 @@ class DetectionService:
                     'X_test': df_syn.drop('label', axis=1),
                     'y_test': df_syn['label']
                 }
-                print(f"✅ Loaded SYN dataset: {len(df_syn)} samples")
+                print(f"âœ… Loaded SYN dataset: {len(df_syn)} samples")
                 self.system_logger.info(f"Loaded SYN dataset: {len(df_syn)} samples")
                 datasets_loaded.append(('SYN', len(df_syn)))
             
@@ -145,7 +145,7 @@ class DetectionService:
                     'X_test': df_mitm.drop('label', axis=1),
                     'y_test': df_mitm['label']
                 }
-                print(f"✅ Loaded MITM dataset: {len(df_mitm)} samples")
+                print(f"âœ… Loaded MITM dataset: {len(df_mitm)} samples")
                 self.system_logger.info(f"Loaded MITM dataset: {len(df_mitm)} samples")
                 datasets_loaded.append(('MITM', len(df_mitm)))
             
@@ -153,7 +153,7 @@ class DetectionService:
             dns_path = base_path / "baseline_ml_stateful" / "processed_data.parquet"
             if dns_path.exists():
                 df_dns = pd.read_parquet(dns_path)
-                print(f"✅ Loaded DNS dataset: {len(df_dns)} samples")
+                print(f"âœ… Loaded DNS dataset: {len(df_dns)} samples")
                 # Use last 20% as test data for simulation
                 test_size = int(len(df_dns) * 0.2)
                 df_dns_test = df_dns.tail(test_size).reset_index(drop=True)
@@ -161,7 +161,7 @@ class DetectionService:
                     'X_test': df_dns_test.drop('label', axis=1),
                     'y_test': df_dns_test['label']
                 }
-                print(f"✅ Loaded DNS dataset: {len(df_dns_test)} samples")
+                print(f"âœ… Loaded DNS dataset: {len(df_dns_test)} samples")
                 self.system_logger.info(f"Loaded DNS dataset: {len(df_dns_test)} samples")
                 datasets_loaded.append(('DNS', len(df_dns_test)))
             
@@ -570,3 +570,4 @@ class DetectionService:
 
 # Global instance
 detection_service = DetectionService()
+

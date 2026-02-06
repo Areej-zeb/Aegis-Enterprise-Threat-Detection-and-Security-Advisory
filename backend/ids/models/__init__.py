@@ -35,9 +35,9 @@ class ModelRegistry:
             self.syn_xgb = syn_dict['model']
             self.syn_label_encoder = syn_dict['label_encoder']
             self.syn_classes = syn_dict['label_encoder'].classes_
-            print(f"  ✅ SYN model loaded ({len(self.syn_classes)} classes)")
+            print(f"  [OK] SYN model loaded ({len(self.syn_classes)} classes)")
         else:
-            print(f"  ⚠️ SYN model not found at {syn_path}")
+            print(f"  [WARN] SYN model not found at {syn_path}")
         
         # Load MITM model
         mitm_path = Path(__file__).parent.parent.parent.parent / "artifacts" / "mitm_arp" / "xgb_baseline.joblib"
@@ -47,18 +47,18 @@ class ModelRegistry:
             self.mitm_xgb = mitm_dict['model']
             self.mitm_label_encoder = mitm_dict['label_encoder']
             self.mitm_classes = mitm_dict['label_encoder'].classes_
-            print(f"  ✅ MITM model loaded ({len(self.mitm_classes)} classes)")
+            print(f"  [OK] MITM model loaded ({len(self.mitm_classes)} classes)")
         else:
-            print(f"  ⚠️ MITM model not found at {mitm_path}")
+            print(f"  [WARN] MITM model not found at {mitm_path}")
         
         # Load DNS Ensemble model
         dns_path = Path(__file__).parent.parent.parent.parent / "artifacts" / "baseline_ml_stateful" / "ensemble_model.joblib"
         if dns_path.exists():
             print(f"  Loading DNS Ensemble model from {dns_path}")
             self.dns_ensemble = joblib.load(dns_path)
-            print(f"  ✅ DNS Ensemble model loaded (binary classification)")
+            print(f"  [OK] DNS Ensemble model loaded (binary classification)")
         else:
-            print(f"  ⚠️ DNS Ensemble model not found at {dns_path}")
+            print(f"  [WARN] DNS Ensemble model not found at {dns_path}")
         
         print("[ModelRegistry] Model loading complete\n")
     

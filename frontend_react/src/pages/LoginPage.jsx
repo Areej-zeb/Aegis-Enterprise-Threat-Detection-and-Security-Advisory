@@ -8,6 +8,7 @@ import FormField from "../components/form/FormField.jsx";
 import TextInput from "../components/form/TextInput.jsx";
 import PasswordInput from "../components/form/PasswordInput.jsx";
 import PrimaryButton from "../components/buttons/PrimaryButton.jsx";
+import StatusBar from "../components/common/StatusBar.jsx";
 import { useAuth } from "../context/AuthContext.tsx";
 
 function LoginPage() {

@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import json
 import os
 import random
@@ -41,9 +41,9 @@ app.include_router(pentest_router)
 from backend.ids.serve.mock_auth import router as auth_router
 app.include_router(auth_router)
 
-# Allow both Streamlit (8501) and Vite/React (5173) by default
+# Allow both Streamlit (8501) and Vite/React (5173, 5174) by default
 origins = os.getenv(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:5173"
+    "CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:8501"
 ).split(",")
 
 app.add_middleware(
@@ -114,15 +114,15 @@ async def load_mock_and_models():
     system_logger.info("[Startup] Pre-filling prediction cache for fast responses...")
     print("[Startup] Pre-filling prediction cache for fast responses...")
     detection_service._ensure_cache_filled()
-    system_logger.info("[Startup] ✅ System ready with pre-generated predictions!")
-    print("[Startup] ✅ System ready with pre-generated predictions!")
+    system_logger.info("[Startup] âœ… System ready with pre-generated predictions!")
+    print("[Startup] âœ… System ready with pre-generated predictions!")
 
 # ---------------------------------------------------------------------
 # Environment mode
 # ---------------------------------------------------------------------
-# MODE=demo → random simulated alerts
-# MODE=static → fixed seed list
-# MODE=live → read from live_alerts.json (real packet capture)
+# MODE=demo â†’ random simulated alerts
+# MODE=static â†’ fixed seed list
+# MODE=live â†’ read from live_alerts.json (real packet capture)
 MODE = os.getenv("MODE", "static").lower()
 DEMO_MODE = MODE == "demo"
 LIVE_MODE = MODE == "live"
@@ -741,3 +741,4 @@ async def get_evaluation_summary():
             "dns": models.dns_ensemble is not None
         }
     }
+

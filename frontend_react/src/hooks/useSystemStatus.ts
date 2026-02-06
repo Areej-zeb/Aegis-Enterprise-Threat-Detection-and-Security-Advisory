@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { checkHealth } from '../api/aegisClient';
 
 export interface SystemStatus {
-  environment: 'Demo' | 'Production';
+  environment: 'ML Models' | 'Production';
   idsStatus: 'Healthy' | 'Warning' | 'Error' | 'Checking';
   mockStream: 'ON' | 'OFF';
   overallStatus: 'healthy' | 'warning' | 'error' | 'loading';
@@ -16,7 +16,7 @@ export interface SystemStatus {
 
 export function useSystemStatus() {
   const [systemStatus, setSystemStatus] = useState<SystemStatus>({
-    environment: 'Demo',
+    environment: 'ML Models',
     idsStatus: 'Checking',
     mockStream: 'OFF',
     overallStatus: 'loading'
@@ -45,7 +45,7 @@ export function useSystemStatus() {
       
       // Determine environment
       const backendMode = healthData?.mode || healthData?.components?.database;
-      const environment = (backendMode === 'demo' || backendMode === 'static') ? 'Demo' : 'Production';
+      const environment = (backendMode === 'demo' || backendMode === 'static') ? 'ML Models' : 'Production';
 
       // Determine IDS status
       let idsStatus: SystemStatus['idsStatus'] = 'Healthy';
