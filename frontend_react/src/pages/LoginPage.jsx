@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LockKeyhole, Mail } from "lucide-react";
 import "../index.css";
@@ -8,7 +8,6 @@ import FormField from "../components/form/FormField.jsx";
 import TextInput from "../components/form/TextInput.jsx";
 import PasswordInput from "../components/form/PasswordInput.jsx";
 import PrimaryButton from "../components/buttons/PrimaryButton.jsx";
-import StatusBar from "../components/common/StatusBar.jsx";
 import { useAuth } from "../context/AuthContext.tsx";
 
 function LoginPage() {
@@ -61,7 +60,6 @@ function LoginPage() {
       title="Welcome back to AEGIS"
       subtitle="Log in to access your dashboard"
     >
-      <StatusBar env="Demo" ids="Healthy" />
       <form className="aegis-auth-form" onSubmit={handleSubmit}>
         {error && (
           <div style={{
