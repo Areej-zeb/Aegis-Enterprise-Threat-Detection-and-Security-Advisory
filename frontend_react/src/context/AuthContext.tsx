@@ -1,106 +1,89 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type User = {
+interface User {
   id: string;
   email: string;
-  name?: string;
-  role?: string;
-};
+  name: string;
+}
 
-type AuthContextType = {
+interface AuthContextType {
   user: User | null;
-  token: string | null;
-  loading: boolean;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-};
+  register: (name: string, email: string, password: string) => Promise<void>;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE_URL = import.meta.env.VITE_AUTH_API_BASE_URL || 'http://localhost:5000';
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Rehydrate from localStorage on first load
   useEffect(() => {
-    const storedToken = localStorage.getItem("aegis_token");
-    const storedUser = localStorage.getItem("aegis_user");
-
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        setUser(null);
-      }
+    // Check if user is already logged in
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      // Verify token and load user
+      setUser(JSON.parse(localStorage.getItem('user') || 'null'));
     }
-    setLoading(false);
+    setIsLoading(false);
   }, []);
 
-  // 2. Login helper – call your backend and persist state
   const login = async (email: string, password: string) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
+      if (!response.ok) throw new Error('Login failed');
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed. Please try again.');
-      }
-
-      // Backend returns { token, user }
-      const accessToken: string = data.token;
-      const userObj: User = data.user;
-
-      setToken(accessToken);
-      setUser(userObj);
-
-      localStorage.setItem("aegis_token", accessToken);
-      localStorage.setItem("aegis_user", JSON.stringify(userObj));
-    } catch (error: any) {
-      // Re-throw so the Login page can handle it
-      throw error;
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  // 3. Logout helper
   const logout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
     setUser(null);
-    setToken(null);
-    localStorage.removeItem("aegis_token");
-    localStorage.removeItem("aegis_user");
+  };
+
+  const register = async (name: string, email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+      if (!response.ok) throw new Error('Registration failed');
+      const data = await response.json();
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = (): AuthContextType => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth must be used within AuthProvider");
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
   }
-  return ctx;
+  return context;
 };
-

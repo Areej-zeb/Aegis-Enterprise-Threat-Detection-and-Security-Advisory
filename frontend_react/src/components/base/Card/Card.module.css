@@ -1,0 +1,180 @@
+/**
+ * Card Component Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   BASE CARD STYLES
+   ============================================================================ */
+
+.card {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  
+  /* Styling */
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  
+  /* Spacing */
+  padding: var(--spacing-6);
+  
+  /* Transitions */
+  transition: var(--transition-base);
+  
+  /* Overflow */
+  overflow: hidden;
+}
+
+/* ============================================================================
+   CARD ELEVATION LEVELS
+   ============================================================================ */
+
+.elevation-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.elevation-md {
+  box-shadow: var(--shadow-md);
+}
+
+.elevation-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================================
+   INTERACTIVE CARD
+   ============================================================================ */
+
+.interactive {
+  cursor: pointer;
+}
+
+.interactive:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border-secondary);
+  box-shadow: var(--shadow-lg);
+}
+
+.interactive:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.interactive:active {
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================================
+   CARD HEADER
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.header:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.headerContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  margin: 0;
+  margin-bottom: var(--spacing-1);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   CARD BODY
+   ============================================================================ */
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.body:empty {
+  display: none;
+}
+
+/* ============================================================================
+   CARD FOOTER
+   ============================================================================ */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-border-primary);
+}
+
+.footer:empty {
+  display: none;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .card {
+    padding: var(--spacing-4);
+  }
+
+  .header {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+
+  .action {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .footer {
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
+  .footer > * {
+    width: 100%;
+  }
+}

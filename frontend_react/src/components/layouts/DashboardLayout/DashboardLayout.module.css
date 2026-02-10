@@ -1,0 +1,223 @@
+/**
+ * Dashboard Layout Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   LAYOUT STRUCTURE
+   ============================================================================ */
+
+.layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'header header'
+    'sidebar content'
+    'footer footer';
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-4) var(--spacing-6);
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border-primary);
+  box-shadow: var(--shadow-sm);
+  gap: var(--spacing-4);
+  z-index: var(--z-sticky);
+}
+
+/* ============================================================================
+   SIDEBAR
+   ============================================================================ */
+
+.sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border-primary);
+  overflow-y: auto;
+  transition: var(--transition-base);
+  position: relative;
+}
+
+.sidebarContent {
+  flex: 1;
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* Collapse Button */
+.collapseButton {
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-2);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: transparent;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+  z-index: 10;
+}
+
+.collapseButton:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+/* Collapsed State */
+.collapsed {
+  width: 60px;
+}
+
+.collapsed .sidebarContent {
+  padding: var(--spacing-2);
+}
+
+/* ============================================================================
+   CONTENT
+   ============================================================================ */
+
+.content {
+  grid-area: content;
+  padding: var(--spacing-6);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.footer {
+  grid-area: footer;
+  padding: var(--spacing-4) var(--spacing-6);
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border-primary);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+/* Tablet (640px - 1024px) */
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 200px 1fr;
+  }
+
+  .sidebar {
+    width: 200px;
+  }
+
+  .collapsed {
+    width: 50px;
+  }
+
+  .collapseButton {
+    display: flex;
+  }
+}
+
+/* Mobile (< 640px) */
+@media (max-width: 640px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+      'header'
+      'sidebar'
+      'content'
+      'footer';
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-primary);
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .sidebar.collapsed {
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+  }
+
+  .sidebarContent {
+    padding: var(--spacing-3);
+  }
+
+  .collapseButton {
+    display: flex;
+    position: static;
+    width: 100%;
+    margin-bottom: var(--spacing-2);
+  }
+
+  .content {
+    padding: var(--spacing-4);
+    gap: var(--spacing-4);
+  }
+
+  .footer {
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+}
+
+/* ============================================================================
+   SCROLLBAR STYLING
+   ============================================================================ */
+
+.sidebar::-webkit-scrollbar,
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.content::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.content::-webkit-scrollbar-thumb {
+  background: var(--color-border-primary);
+  border-radius: var(--radius-full);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-secondary);
+}

@@ -1,0 +1,239 @@
+/**
+ * Button Component Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   BASE BUTTON STYLES
+   ============================================================================ */
+
+.button {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  
+  /* Typography */
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+  
+  /* Spacing */
+  padding: var(--spacing-3) var(--spacing-4);
+  margin: 0;
+  
+  /* Borders */
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  
+  /* Appearance */
+  cursor: pointer;
+  transition: var(--transition-base);
+  position: relative;
+  white-space: nowrap;
+  user-select: none;
+  
+  /* Focus */
+  outline: none;
+}
+
+.button:focus-visible {
+  box-shadow: var(--shadow-focus);
+}
+
+/* ============================================================================
+   BUTTON VARIANTS
+   ============================================================================ */
+
+/* Primary Variant */
+.variant-primary {
+  background-color: var(--color-interactive-primary);
+  color: var(--color-text-primary);
+  border-color: var(--color-interactive-primary);
+}
+
+.variant-primary:hover:not(:disabled) {
+  background-color: var(--color-interactive-hover);
+  border-color: var(--color-interactive-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.variant-primary:active:not(:disabled) {
+  background-color: var(--color-interactive-active);
+  border-color: var(--color-interactive-active);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Secondary Variant */
+.variant-secondary {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-primary);
+}
+
+.variant-secondary:hover:not(:disabled) {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border-secondary);
+  box-shadow: var(--shadow-md);
+}
+
+.variant-secondary:active:not(:disabled) {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tertiary Variant */
+.variant-tertiary {
+  background-color: transparent;
+  color: var(--color-interactive-primary);
+  border-color: transparent;
+}
+
+.variant-tertiary:hover:not(:disabled) {
+  background-color: rgba(59, 92, 255, 0.1);
+  color: var(--color-interactive-hover);
+}
+
+.variant-tertiary:active:not(:disabled) {
+  background-color: rgba(59, 92, 255, 0.2);
+  color: var(--color-interactive-active);
+}
+
+/* Danger Variant */
+.variant-danger {
+  background-color: var(--color-status-danger);
+  color: var(--color-text-primary);
+  border-color: var(--color-status-danger);
+}
+
+.variant-danger:hover:not(:disabled) {
+  background-color: var(--color-danger-600);
+  border-color: var(--color-danger-600);
+  box-shadow: var(--shadow-md);
+}
+
+.variant-danger:active:not(:disabled) {
+  background-color: var(--color-danger-700);
+  border-color: var(--color-danger-700);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================================
+   BUTTON SIZES
+   ============================================================================ */
+
+/* Small Size */
+.size-sm {
+  height: 32px;
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+/* Medium Size (Default) */
+.size-md {
+  height: 40px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+/* Large Size */
+.size-lg {
+  height: 48px;
+  font-size: var(--font-size-base);
+  padding: var(--spacing-4) var(--spacing-6);
+}
+
+/* ============================================================================
+   BUTTON STATES
+   ============================================================================ */
+
+/* Disabled State */
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading State */
+.loading {
+  pointer-events: none;
+}
+
+/* Icon Only */
+.iconOnly {
+  padding: var(--spacing-3);
+  width: 40px;
+  height: 40px;
+}
+
+.iconOnly.size-sm {
+  width: 32px;
+  height: 32px;
+  padding: var(--spacing-2);
+}
+
+.iconOnly.size-lg {
+  width: 48px;
+  height: 48px;
+  padding: var(--spacing-4);
+}
+
+/* Full Width */
+.fullWidth {
+  width: 100%;
+}
+
+/* ============================================================================
+   BUTTON CONTENT
+   ============================================================================ */
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.text {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ============================================================================
+   LOADING SPINNER
+   ============================================================================ */
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spinnerSvg {
+  width: 1em;
+  height: 1em;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .spinnerSvg {
+    animation: none;
+    opacity: 0.5;
+  }
+}

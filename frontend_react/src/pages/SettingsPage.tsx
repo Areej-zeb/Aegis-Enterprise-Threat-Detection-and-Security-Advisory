@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "../index.css";
-import "./SettingsPage.css";
 import { Settings, Bell, Zap, Plug2, Save, Circle, RefreshCw } from "lucide-react";
 import { checkHealth } from "../api/aegisClient";
 import { StatusPill } from "../components/common";

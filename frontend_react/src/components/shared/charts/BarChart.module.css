@@ -1,0 +1,120 @@
+/**
+ * Bar Chart Styles
+ */
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-6);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+}
+
+.bar-chart__title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.bar-chart__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.bar-chart__svg {
+  display: block;
+  font-family: var(--font-family-base);
+}
+
+.bar-chart__axis {
+  stroke: var(--color-border-primary);
+  stroke-width: 2;
+}
+
+.bar-chart__axis-label {
+  font-size: 12px;
+  fill: var(--color-text-secondary);
+  text-anchor: end;
+}
+
+.bar-chart__grid-line {
+  stroke: var(--color-border-secondary);
+  stroke-width: 1;
+  stroke-dasharray: 4, 4;
+  opacity: 0.5;
+}
+
+.bar-chart__bar {
+  transition: opacity var(--duration-fast) var(--ease-out), filter var(--duration-fast) var(--ease-out);
+  cursor: pointer;
+}
+
+.bar-chart__bar:hover {
+  opacity: 0.8;
+  filter: brightness(1.1);
+}
+
+.bar-chart__label {
+  font-size: 12px;
+  fill: var(--color-text-secondary);
+  text-anchor: middle;
+}
+
+.bar-chart__value {
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
+  fill: var(--color-text-primary);
+  text-anchor: middle;
+}
+
+.bar-chart__empty {
+  padding: var(--spacing-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .bar-chart {
+    padding: var(--spacing-4);
+  }
+
+  .bar-chart__container {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .bar-chart {
+    padding: var(--spacing-3);
+  }
+
+  .bar-chart__title {
+    font-size: var(--font-size-sm);
+  }
+
+  .bar-chart__axis-label {
+    font-size: 10px;
+  }
+
+  .bar-chart__label {
+    font-size: 10px;
+  }
+
+  .bar-chart__value {
+    font-size: 10px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .bar-chart__bar {
+    transition: none;
+  }
+}

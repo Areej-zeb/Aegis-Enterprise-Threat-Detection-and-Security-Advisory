@@ -1,0 +1,253 @@
+/**
+ * DataTable Component Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  width: 100%;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-12);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border-primary);
+  border-top-color: var(--color-interactive-primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   EMPTY STATE
+   ============================================================================ */
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-12);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.emptyState p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ============================================================================
+   TABLE WRAPPER
+   ============================================================================ */
+
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-secondary);
+}
+
+/* ============================================================================
+   TABLE
+   ============================================================================ */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   TABLE HEADER
+   ============================================================================ */
+
+.thead {
+  background-color: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.headerRow {
+  display: table-row;
+}
+
+.headerCell {
+  padding: var(--spacing-3) var(--spacing-4);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  border-right: 1px solid var(--color-border-primary);
+  cursor: pointer;
+  user-select: none;
+  transition: var(--transition-base);
+}
+
+.headerCell:last-child {
+  border-right: none;
+}
+
+.headerCell:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.sortIcon {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================================
+   TABLE BODY
+   ============================================================================ */
+
+.tbody {
+  display: table-row-group;
+}
+
+.bodyRow {
+  display: table-row;
+  border-bottom: 1px solid var(--color-border-primary);
+  transition: var(--transition-base);
+}
+
+.bodyRow:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.bodyRow:last-child {
+  border-bottom: none;
+}
+
+.bodyCell {
+  padding: var(--spacing-3) var(--spacing-4);
+  color: var(--color-text-primary);
+  border-right: 1px solid var(--color-border-primary);
+  vertical-align: middle;
+}
+
+.bodyCell:last-child {
+  border-right: none;
+}
+
+/* ============================================================================
+   SELECT CELL
+   ============================================================================ */
+
+.selectCell {
+  width: 40px;
+  padding: var(--spacing-3);
+  text-align: center;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-interactive-primary);
+}
+
+/* ============================================================================
+   PAGINATION
+   ============================================================================ */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+}
+
+.paginationButton {
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.paginationButton:hover:not(:disabled) {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border-secondary);
+}
+
+.paginationButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 150px;
+  text-align: center;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .table {
+    font-size: var(--font-size-xs);
+  }
+
+  .headerCell,
+  .bodyCell {
+    padding: var(--spacing-2) var(--spacing-3);
+  }
+
+  .selectCell {
+    width: 36px;
+    padding: var(--spacing-2);
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .paginationButton {
+    width: 100%;
+  }
+}

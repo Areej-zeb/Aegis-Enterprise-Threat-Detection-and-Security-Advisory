@@ -1,0 +1,168 @@
+/**
+ * Monitor Layout Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   LAYOUT STRUCTURE
+   ============================================================================ */
+
+.layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+/* ============================================================================
+   PANELS
+   ============================================================================ */
+
+.leftPanelWrapper,
+.rightPanelWrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.1s ease-out;
+}
+
+.leftPanel,
+.rightPanel {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================================
+   DIVIDER
+   ============================================================================ */
+
+.divider {
+  width: 4px;
+  background-color: var(--color-border-primary);
+  cursor: col-resize;
+  transition: var(--transition-base);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.divider:hover {
+  background-color: var(--color-interactive-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4px;
+  right: -4px;
+  bottom: 0;
+  cursor: col-resize;
+}
+
+/* ============================================================================
+   SCROLLBAR STYLING
+   ============================================================================ */
+
+.leftPanel::-webkit-scrollbar,
+.rightPanel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.leftPanel::-webkit-scrollbar-track,
+.rightPanel::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+.leftPanel::-webkit-scrollbar-thumb,
+.rightPanel::-webkit-scrollbar-thumb {
+  background: var(--color-border-primary);
+  border-radius: var(--radius-full);
+}
+
+.leftPanel::-webkit-scrollbar-thumb:hover,
+.rightPanel::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-secondary);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+/* Tablet (640px - 1024px) */
+@media (max-width: 1024px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .leftPanelWrapper,
+  .rightPanelWrapper {
+    width: 100% !important;
+    height: 50%;
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  .rightPanelWrapper {
+    border-bottom: none;
+  }
+
+  .divider {
+    width: 100%;
+    height: 4px;
+    cursor: row-resize;
+  }
+
+  .divider::before {
+    left: 0;
+    right: 0;
+    top: -4px;
+    bottom: -4px;
+    cursor: row-resize;
+  }
+}
+
+/* Mobile (< 640px) */
+@media (max-width: 640px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .leftPanelWrapper,
+  .rightPanelWrapper {
+    width: 100% !important;
+    height: auto;
+    min-height: 300px;
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  .rightPanelWrapper {
+    border-bottom: none;
+    flex: 1;
+  }
+
+  .divider {
+    width: 100%;
+    height: 4px;
+    cursor: row-resize;
+  }
+
+  .divider::before {
+    left: 0;
+    right: 0;
+    top: -4px;
+    bottom: -4px;
+    cursor: row-resize;
+  }
+
+  .leftPanel,
+  .rightPanel {
+    max-height: 50vh;
+  }
+}

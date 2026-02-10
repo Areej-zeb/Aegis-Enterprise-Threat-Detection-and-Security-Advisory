@@ -28,7 +28,7 @@ node start-all.js
 
 ## 📦 What Gets Started
 
-The startup script automatically starts all three services:
+The startup script automatically starts all four services:
 
 1. **🔐 Auth Backend** (Port 5000)
    - User authentication & JWT tokens
@@ -41,7 +41,12 @@ The startup script automatically starts all three services:
    - Alert streaming
    - API documentation
 
-3. **🎨 Frontend** (Port 5173)
+3. **🔍 Pentest Backend** (Port 8001)
+   - Vulnerability scanning
+   - Penetration testing tools
+   - CVE database integration
+
+4. **🎨 Frontend** (Port 5173)
    - React dashboard
    - Real-time alerts
    - Analytics & visualizations
@@ -53,6 +58,7 @@ After starting, you can access:
 - **Frontend Dashboard**: http://localhost:5173
 - **Auth API**: http://localhost:5000
 - **Main API**: http://localhost:8000
+- **Pentest API**: http://localhost:8001
 - **API Documentation**: http://localhost:8000/docs
 
 ## 🔧 Manual Start (Alternative)
@@ -78,7 +84,19 @@ cd backend/ids/serve
 uvicorn app:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 3. Frontend
+### 3. Pentest Backend
+```bash
+# Activate virtual environment
+venv\Scripts\activate  # Windows
+# or
+source venv/bin/activate  # Linux/Mac
+
+# Start server
+cd backend/pentest
+uvicorn api:app --reload --host 0.0.0.0 --port 8001
+```
+
+### 4. Frontend
 ```bash
 cd frontend_react
 npm install  # First time only
@@ -114,7 +132,8 @@ npm run dev
 ### Port Already in Use
 If you see "port already in use" errors:
 - **Port 5000**: Stop any other Node.js services
-- **Port 8000**: Stop any other Python/FastAPI services  
+- **Port 8000**: Stop any other Python/FastAPI services
+- **Port 8001**: Stop any other Python/FastAPI services
 - **Port 5173**: Stop any other Vite/React dev servers
 
 ### Dependencies Not Found

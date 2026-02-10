@@ -13,9 +13,6 @@ Node.js/Express backend for user authentication with MongoDB Atlas.
    - Copy `.env.example` to `.env` (or create `.env` manually)
    - The `.env` file should contain:
      ```
-     MONGO_URI=mongodb+srv://sahariq9009:iLoVeToPaRtY-20@cluster0.xq0ylja.mongodb.net/
-     JWT_SECRET=supersecretkey12345
-     ```
 
 3. **Start the server:**
    ```bash

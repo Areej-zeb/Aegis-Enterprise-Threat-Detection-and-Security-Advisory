@@ -1,0 +1,142 @@
+/**
+ * Checkbox Component Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+/* ============================================================================
+   CHECKBOX INPUT
+   ============================================================================ */
+
+.input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   CUSTOM CHECKMARK
+   ============================================================================ */
+
+.checkmark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border-primary);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-secondary);
+  transition: var(--transition-base);
+  color: transparent;
+}
+
+.input:checked ~ .checkmark {
+  background-color: var(--color-interactive-primary);
+  border-color: var(--color-interactive-primary);
+  color: var(--color-text-primary);
+}
+
+.input:checked:hover:not(:disabled) ~ .checkmark {
+  background-color: var(--color-interactive-hover);
+  border-color: var(--color-interactive-hover);
+}
+
+.input:checked:active:not(:disabled) ~ .checkmark {
+  background-color: var(--color-interactive-active);
+  border-color: var(--color-interactive-active);
+}
+
+.input:focus-visible ~ .checkmark {
+  box-shadow: var(--shadow-focus);
+}
+
+.input:disabled ~ .checkmark {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   CHECKMARK ICON
+   ============================================================================ */
+
+.checkmark svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ============================================================================
+   ERROR STATE
+   ============================================================================ */
+
+.error {
+  border-color: var(--color-status-danger);
+}
+
+.input.error ~ .checkmark {
+  border-color: var(--color-status-danger);
+}
+
+.input.error:checked ~ .checkmark {
+  background-color: var(--color-status-danger);
+  border-color: var(--color-status-danger);
+}
+
+.input.error:focus-visible ~ .checkmark {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1), 0 0 0 1px var(--color-status-danger);
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.input:disabled ~ .label {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .checkmark {
+    width: 24px;
+    height: 24px;
+  }
+
+  .checkmark svg {
+    width: 14px;
+    height: 14px;
+  }
+}

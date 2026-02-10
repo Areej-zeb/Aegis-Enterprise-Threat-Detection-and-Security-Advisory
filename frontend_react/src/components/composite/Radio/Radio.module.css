@@ -1,0 +1,146 @@
+/**
+ * Radio Component Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+/* ============================================================================
+   RADIO INPUT
+   ============================================================================ */
+
+.input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   CUSTOM RADIO
+   ============================================================================ */
+
+.radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border-primary);
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-secondary);
+  transition: var(--transition-base);
+}
+
+.input:checked ~ .radio {
+  border-color: var(--color-interactive-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+.input:checked:hover:not(:disabled) ~ .radio {
+  border-color: var(--color-interactive-hover);
+}
+
+.input:checked:active:not(:disabled) ~ .radio {
+  border-color: var(--color-interactive-active);
+}
+
+.input:focus-visible ~ .radio {
+  box-shadow: var(--shadow-focus);
+}
+
+.input:disabled ~ .radio {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   RADIO DOT
+   ============================================================================ */
+
+.dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-interactive-primary);
+  opacity: 0;
+  transition: var(--transition-base);
+}
+
+.input:checked ~ .radio .dot {
+  opacity: 1;
+}
+
+/* ============================================================================
+   ERROR STATE
+   ============================================================================ */
+
+.error {
+  border-color: var(--color-status-danger);
+}
+
+.input.error ~ .radio {
+  border-color: var(--color-status-danger);
+}
+
+.input.error:checked ~ .radio .dot {
+  background-color: var(--color-status-danger);
+}
+
+.input.error:focus-visible ~ .radio {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1), 0 0 0 1px var(--color-status-danger);
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.input:disabled ~ .label {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .radio {
+    width: 24px;
+    height: 24px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+}

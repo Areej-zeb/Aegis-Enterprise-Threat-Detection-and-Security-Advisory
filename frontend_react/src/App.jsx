@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import "./index.css";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import DashboardPage from "./pages/DashboardPage";
 import IDSPage from "./pages/IDSPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -100,6 +101,7 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Protected routes */}
         <Route element={<RequireAuth />}>

@@ -1,1 +1,17 @@
-{}
+{
+  "name": "aegis-ids",
+  "version": "0.2.0",
+  "description": "Aegis Enterprise Threat Detection System",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend_react && npm run dev",
+    "dev:backend": "cd backend && python -m uvicorn ids.serve.app:app --reload --host 0.0.0.0 --port 8000",
+    "build": "cd frontend_react && npm run build",
+    "preview": "cd frontend_react && npm run preview"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

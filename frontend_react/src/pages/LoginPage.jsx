@@ -98,7 +98,7 @@ function LoginPage() {
             <button
               type="button"
               className="aegis-link aegis-forgot-link"
-              onClick={() => console.log("Forgot password clicked")}
+              onClick={() => navigate("/forgot-password")}
             >
               Forgot your password?
             </button>

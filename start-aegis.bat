@@ -21,12 +21,20 @@ if not exist "artifacts\" (
     exit /b 1
 )
 
-REM Start backend in background
+REM Start auth backend in background
+echo Starting Auth Backend (port 5000)...
+start "Aegis Auth" cmd /k "cd backend_auth && npm start"
+timeout /t 2 /nobreak >nul
+
+REM Start main backend in background
 echo Starting FastAPI backend (port 8000)...
 start "Aegis Backend" cmd /k "set PYTHONPATH=. && uvicorn backend.ids.serve.app:app --port 8000"
-
-REM Wait for backend to start
 timeout /t 3 /nobreak >nul
+
+REM Start pentest backend in background
+echo Starting Pentest Backend (port 8001)...
+start "Aegis Pentest" cmd /k "set PYTHONPATH=. && uvicorn backend.pentest.api:app --port 8001"
+timeout /t 2 /nobreak >nul
 
 echo Starting React Dashboard (port 5173)...
 cd frontend_react

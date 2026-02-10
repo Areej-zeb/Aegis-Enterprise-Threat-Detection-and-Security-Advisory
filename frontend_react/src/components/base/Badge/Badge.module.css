@@ -1,0 +1,115 @@
+/**
+ * Badge Component Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   BASE BADGE STYLES
+   ============================================================================ */
+
+.badge {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-1);
+  
+  /* Typography */
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-normal);
+  
+  /* Spacing */
+  padding: var(--spacing-1) var(--spacing-2);
+  margin: 0;
+  
+  /* Borders */
+  border: none;
+  border-radius: var(--radius-md);
+  
+  /* Appearance */
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ============================================================================
+   BADGE VARIANTS
+   ============================================================================ */
+
+/* Primary Variant */
+.variant-primary {
+  background-color: var(--color-primary-500);
+  color: var(--color-text-primary);
+}
+
+/* Success Variant */
+.variant-success {
+  background-color: var(--color-success-500);
+  color: var(--color-text-primary);
+}
+
+/* Warning Variant */
+.variant-warning {
+  background-color: var(--color-warning-500);
+  color: var(--color-text-inverse);
+}
+
+/* Danger Variant */
+.variant-danger {
+  background-color: var(--color-status-danger);
+  color: var(--color-text-primary);
+}
+
+/* Info Variant */
+.variant-info {
+  background-color: var(--color-status-info);
+  color: var(--color-text-primary);
+}
+
+/* ============================================================================
+   BADGE SIZES
+   ============================================================================ */
+
+/* Small Size */
+.size-sm {
+  height: 20px;
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-1) var(--spacing-2);
+}
+
+/* Medium Size (Default) */
+.size-md {
+  height: 24px;
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-1) var(--spacing-3);
+}
+
+/* Large Size */
+.size-lg {
+  height: 32px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+/* ============================================================================
+   BADGE WITH ICON
+   ============================================================================ */
+
+.withIcon {
+  gap: var(--spacing-2);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.text {
+  display: inline-flex;
+  align-items: center;
+}

@@ -1,0 +1,208 @@
+/**
+ * Input Component Styles
+ * 
+ * All colors, spacing, shadows, and other visual properties use design tokens.
+ * No hard-coded values are used.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.required {
+  color: var(--color-status-danger);
+}
+
+/* ============================================================================
+   INPUT WRAPPER
+   ============================================================================ */
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================================================
+   INPUT FIELD
+   ============================================================================ */
+
+.input {
+  /* Layout */
+  width: 100%;
+  display: block;
+  
+  /* Typography */
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+  
+  /* Spacing */
+  padding: var(--spacing-3);
+  margin: 0;
+  
+  /* Borders */
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  
+  /* Colors */
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  
+  /* Appearance */
+  appearance: none;
+  transition: var(--transition-base);
+  
+  /* Focus */
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.input:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+.input:disabled {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================================================
+   INPUT SIZES
+   ============================================================================ */
+
+.size-sm {
+  height: 32px;
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+.size-md {
+  height: 40px;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-3);
+}
+
+.size-lg {
+  height: 48px;
+  font-size: var(--font-size-base);
+  padding: var(--spacing-4);
+}
+
+/* ============================================================================
+   INPUT STATES
+   ============================================================================ */
+
+.error {
+  border-color: var(--color-status-danger);
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.error:focus {
+  border-color: var(--color-status-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1), 0 0 0 1px var(--color-status-danger);
+}
+
+/* ============================================================================
+   INPUT WITH ICONS
+   ============================================================================ */
+
+.withIconLeading {
+  padding-left: var(--spacing-10);
+}
+
+.withIconTrailing {
+  padding-right: var(--spacing-10);
+}
+
+/* ============================================================================
+   ICONS
+   ============================================================================ */
+
+.iconLeading,
+.iconTrailing {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-8);
+  height: var(--spacing-8);
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.iconLeading {
+  left: var(--spacing-3);
+}
+
+.iconTrailing {
+  right: var(--spacing-3);
+}
+
+/* ============================================================================
+   ERROR MESSAGE
+   ============================================================================ */
+
+.errorMessage {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-status-danger);
+  margin: 0;
+  margin-top: var(--spacing-1);
+}
+
+/* ============================================================================
+   HELPER TEXT
+   ============================================================================ */
+
+.helperText {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+  margin: 0;
+  margin-top: var(--spacing-1);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}

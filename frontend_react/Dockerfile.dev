@@ -1,10 +1,4 @@
-# ==============================================================================
-# Aegis Frontend - Development Dockerfile
-# ==============================================================================
-# Development setup with Vite dev server and hot-reload
-# ==============================================================================
-
-FROM node:20-alpine as development
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -12,13 +6,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --legacy-peer-deps
+RUN npm ci
 
-# Copy source code
+# Copy application code
 COPY . .
 
-# Expose Vite dev server port
+# Expose port for Vite dev server
 EXPOSE 5173
 
-# Start development server
+# Start development server with host binding
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

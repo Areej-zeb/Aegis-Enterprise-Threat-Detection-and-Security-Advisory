@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import "../index.css";
-import "./SettingsPage.css";
 import { LineChart, BarChart3, Activity, Gauge, Server, AlertTriangle, Heart, Shield, Target, TrendingUp, RefreshCcw, RotateCw, Circle, Zap } from "lucide-react";
 import { getMetricsOverview, checkHealth } from "../api/aegisClient.ts";
 import { generateMetricsOverview, generateMonthlyThreats } from "../utils/mockDataGenerator.ts";

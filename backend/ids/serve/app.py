@@ -27,7 +27,7 @@ error_logger = get_error_logger()
 system_logger = get_system_logger()
 
 # Import pentest router
-from backend.pentest.api import router as pentest_router
+from pentest.api import router as pentest_router
 
 # ---------------------------------------------------------------------
 # App setup
@@ -38,7 +38,7 @@ app = FastAPI(title="Aegis IDS Mock Service", version="0.2.0")
 app.include_router(pentest_router)
 
 # Import and include Mock Auth router
-from backend.ids.serve.mock_auth import router as auth_router
+from ids.serve.mock_auth import router as auth_router
 app.include_router(auth_router)
 
 # Allow both Streamlit (8501) and Vite/React (5173, 5174) by default

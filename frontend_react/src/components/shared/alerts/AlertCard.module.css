@@ -1,0 +1,116 @@
+/**
+ * Alert Card Styles
+ */
+
+.alert-card {
+  cursor: pointer;
+  transition: var(--transition-base);
+  border: 1px solid var(--color-border-primary);
+}
+
+.alert-card:hover {
+  border-color: var(--color-primary-500);
+  box-shadow: var(--shadow-lg);
+}
+
+.alert-card--selected {
+  border-color: var(--color-primary-500);
+  background-color: rgba(59, 92, 255, 0.05);
+  box-shadow: 0 0 0 2px rgba(59, 92, 255, 0.1);
+}
+
+.alert-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.alert-card__title-section {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-card__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-card__type {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+.alert-card__timestamp {
+  margin: var(--spacing-1) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.alert-card__content {
+  margin-bottom: var(--spacing-4);
+}
+
+.alert-card__description {
+  margin: 0 0 var(--spacing-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-normal);
+}
+
+.alert-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.alert-card__detail {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-xs);
+}
+
+.alert-card__label {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  flex-shrink: 0;
+}
+
+.alert-card__value {
+  color: var(--color-primary-400);
+  font-family: var(--font-family-mono);
+  word-break: break-all;
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-card__actions {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .alert-card__header {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .alert-card__actions {
+    flex-direction: column;
+  }
+
+  .alert-card__actions button {
+    width: 100%;
+  }
+}

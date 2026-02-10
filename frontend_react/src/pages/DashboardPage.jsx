@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "../index.css";
-import "./SettingsPage.css";
 import {
   Bell,
   UserRound,

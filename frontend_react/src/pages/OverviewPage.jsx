@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import "../index.css";
-import "./SettingsPage.css";
 import { Activity, Gauge, Server, AlertTriangle, Heart, Shield, Target, TrendingUp, RefreshCcw, RotateCw, Circle, Zap } from "lucide-react";
 import { getMetricsOverview, getSystemStatus, checkHealth } from "../api/aegisClient.ts";
 import { StatCard, StatusPill } from "../components/common";

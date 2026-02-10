@@ -1,0 +1,115 @@
+/**
+ * Alert Table Styles
+ */
+
+.alert-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.alert-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.alert-table__head {
+  background-color: var(--color-bg-tertiary);
+  border-bottom: 2px solid var(--color-border-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.alert-table__head th {
+  padding: var(--spacing-3);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.alert-table__cell--sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.alert-table__cell--sortable:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.alert-table__cell--checkbox {
+  width: 40px;
+  padding: var(--spacing-2);
+  text-align: center;
+}
+
+.alert-table__body tr {
+  border-bottom: 1px solid var(--color-border-primary);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.alert-table__body tr:hover {
+  background-color: rgba(59, 92, 255, 0.05);
+}
+
+.alert-table__row--selected {
+  background-color: rgba(59, 92, 255, 0.1);
+  border-left: 3px solid var(--color-primary-500);
+}
+
+.alert-table__cell {
+  padding: var(--spacing-3);
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+.alert-table__code {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-primary-400);
+  background-color: rgba(59, 92, 255, 0.1);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+.alert-table__timestamp {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.alert-table__empty-cell {
+  color: var(--color-text-tertiary);
+}
+
+.alert-table__loading,
+.alert-table__empty {
+  padding: var(--spacing-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .alert-table__table {
+    font-size: var(--font-size-xs);
+  }
+
+  .alert-table__head th,
+  .alert-table__cell {
+    padding: var(--spacing-2);
+  }
+}
+
+@media (max-width: 640px) {
+  .alert-table {
+    overflow-x: auto;
+  }
+
+  .alert-table__table {
+    min-width: 600px;
+  }
+}

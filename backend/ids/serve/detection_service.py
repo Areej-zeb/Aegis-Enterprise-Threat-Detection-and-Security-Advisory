@@ -20,7 +20,7 @@ from .logger_config import (
     get_error_logger,
     log_with_extra
 )
-from backend.ids.engine.correlation import CorrelationEngine
+from ..engine.correlation import CorrelationEngine
 
 # Suppress sklearn feature name warnings
 warnings.filterwarnings('ignore', message='X has feature names')

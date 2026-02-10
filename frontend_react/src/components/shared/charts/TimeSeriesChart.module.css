@@ -1,0 +1,135 @@
+/**
+ * Time Series Chart Styles
+ */
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-6);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+}
+
+.chart__title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.chart__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.chart__svg {
+  display: block;
+  font-family: var(--font-family-base);
+}
+
+.chart__axis {
+  stroke: var(--color-border-primary);
+  stroke-width: 2;
+}
+
+.chart__axis-label {
+  font-size: 12px;
+  fill: var(--color-text-secondary);
+  text-anchor: middle;
+}
+
+.chart__grid-line {
+  stroke: var(--color-border-secondary);
+  stroke-width: 1;
+  stroke-dasharray: 4, 4;
+  opacity: 0.5;
+}
+
+.chart__line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart__point {
+  transition: r var(--duration-fast) var(--ease-out);
+  cursor: pointer;
+}
+
+.chart__point:hover {
+  r: 6;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.chart__legend {
+  display: flex;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chart__legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-tertiary);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.chart__legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.chart__empty {
+  padding: var(--spacing-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .chart {
+    padding: var(--spacing-4);
+  }
+
+  .chart__container {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .chart {
+    padding: var(--spacing-3);
+  }
+
+  .chart__title {
+    font-size: var(--font-size-sm);
+  }
+
+  .chart__axis-label {
+    font-size: 10px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .chart__point {
+    transition: none;
+  }
+
+  .chart__legend-item {
+    transition: none;
+  }
+}
