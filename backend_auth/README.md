@@ -12,7 +12,6 @@ Node.js/Express backend for user authentication with MongoDB Atlas.
 2. **Configure environment:**
    - Copy `.env.example` to `.env` (or create `.env` manually)
    - The `.env` file should contain:
-     ```
 
 3. **Start the server:**
    ```bash
