@@ -68,12 +68,29 @@
 git clone https://github.com/Areej-zeb/Aegis-Enterprise-Threat-Detection-and-Security-Advisory.git
 cd Aegis-Enterprise-Threat-Detection-and-Security-Advisory
 
-# 2️⃣ Run the setup script
-# Linux/macOS/WSL:
-chmod +x start-aegis.sh && ./start-aegis.sh
+# 2️⃣ Install Python dependencies
+pip install -r requirements.txt
 
+# 3️⃣ Install Node dependencies for unified backend
+cd backend/unified
+npm install
+cd ../..
+
+# 4️⃣ Install frontend dependencies
+cd frontend_react
+npm install
+cd ../..
+
+# 5️⃣ Configure MongoDB (edit backend_auth/.env)
+# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/
+# JWT_SECRET=your_secret_key
+
+# 6️⃣ Run the system
 # Windows:
-start-aegis.bat
+START_AEGIS.bat
+
+# Linux/macOS:
+chmod +x start-aegis.sh && ./start-aegis.sh
 ```
 
 ### 🌐 Access Points
@@ -81,16 +98,68 @@ start-aegis.bat
 | Service | URL | Description |
 |---------|-----|-------------|
 | **React Dashboard** | http://localhost:5173 | Modern web interface |
-| **Streamlit Dashboard** | http://localhost:8501 | ML analytics & monitoring |
-| **Backend API** | http://localhost:8000 | REST API endpoints |
+| **Unified Backend** | http://localhost:5000 | Express proxy + Auth |
+| **Backend API** | http://localhost:8000 | FastAPI endpoints |
 | **API Documentation** | http://localhost:8000/docs | Interactive API docs |
+
+### 🔑 Default Credentials
+
+```
+Email: admin@aegis.local
+Password: admin123
+```
+
+Or create a new account via signup.
 
 ---
 
 ## 🔧 Manual Setup
 
 <details>
-<summary><strong>🐍 Python Backend Setup</strong></summary>
+<summary><strong>🚀 Unified Backend Setup</strong></summary>
+
+```bash
+# 1️⃣ Navigate to unified backend
+cd backend/unified
+
+# 2️⃣ Install Node.js dependencies
+npm install
+
+# 3️⃣ Configure environment (.env)
+# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/
+# JWT_SECRET=your_secret_key
+# PORT=5000
+
+# 4️⃣ Start backend server
+npm start
+```
+
+The unified backend:
+- Runs Express on port 5000
+- Proxies Python services (IDS, Pentest) from port 8000
+- Handles authentication and routing
+- Manages WebSocket connections
+
+</details>
+
+<details>
+<summary><strong>⚛️ React Frontend Setup</strong></summary>
+
+```bash
+# 1️⃣ Navigate to React app
+cd frontend_react
+
+# 2️⃣ Install Node.js dependencies
+npm install
+
+# 3️⃣ Start development server
+npm run dev
+```
+
+</details>
+
+<details>
+<summary><strong>🐍 Python Backend Setup (Optional)</strong></summary>
 
 ```bash
 # 1️⃣ Create virtual environment
@@ -113,37 +182,8 @@ set MODE=demo
 export PYTHONPATH=$(pwd)
 export MODE=demo
 
-# 5️⃣ Start backend server
-py -m uvicorn backend.ids.serve.app:app --reload --host 0.0.0.0 --port 8000
-```
-
-</details>
-
-<details>
-<summary><strong>⚛️ React Frontend Setup</strong></summary>
-
-```bash
-# 1️⃣ Navigate to React app
-cd frontend_react
-
-# 2️⃣ Install Node.js dependencies
-npm install
-
-# 3️⃣ Start development server
-npm run dev
-```
-
-</details>
-
-<details>
-<summary><strong>📊 Streamlit Dashboard Setup</strong></summary>
-
-```bash
-# 1️⃣ Navigate to Streamlit app
-cd frontend_streamlit
-
-# 2️⃣ Start Streamlit server
-streamlit run aegis_dashboard.py --server.port 8501
+# 5️⃣ Start backend server (runs on port 8000)
+python -m uvicorn backend.ids.serve.app:app --reload --host 0.0.0.0 --port 8000
 ```
 
 </details>
