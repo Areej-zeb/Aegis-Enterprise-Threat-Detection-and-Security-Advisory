@@ -28,25 +28,15 @@ node start-all.js
 
 ## 📦 What Gets Started
 
-The startup script automatically starts all four services:
+The startup script automatically starts all services through a unified backend:
 
-1. **🔐 Auth Backend** (Port 5000)
-   - User authentication & JWT tokens
-   - MongoDB connection
-   - Login/Signup endpoints
+1. **🔐 Unified Backend** (Port 5000)
+   - Auth service (Node.js)
+   - IDS detection engine (Python)
+   - Pentest scanning (Python)
+   - Single entry point for all services
 
-2. **🚀 Main Backend** (Port 8000)
-   - IDS detection engine
-   - ML model inference
-   - Alert streaming
-   - API documentation
-
-3. **🔍 Pentest Backend** (Port 8001)
-   - Vulnerability scanning
-   - Penetration testing tools
-   - CVE database integration
-
-4. **🎨 Frontend** (Port 5173)
+2. **🎨 Frontend** (Port 5173)
    - React dashboard
    - Real-time alerts
    - Analytics & visualizations
@@ -56,47 +46,22 @@ The startup script automatically starts all four services:
 After starting, you can access:
 
 - **Frontend Dashboard**: http://localhost:5173
-- **Auth API**: http://localhost:5000
-- **Main API**: http://localhost:8000
-- **Pentest API**: http://localhost:8001
+- **Unified Backend**: http://localhost:5000
 - **API Documentation**: http://localhost:8000/docs
+- **Health Check**: http://localhost:5000/health
 
 ## 🔧 Manual Start (Alternative)
 
 If you prefer to start services individually:
 
-### 1. Auth Backend
+### 1. Unified Backend
 ```bash
-cd backend_auth
+cd backend/unified
 npm install  # First time only
 npm start
 ```
 
-### 2. Main Backend
-```bash
-# Activate virtual environment
-venv\Scripts\activate  # Windows
-# or
-source venv/bin/activate  # Linux/Mac
-
-# Start server
-cd backend/ids/serve
-uvicorn app:app --reload --host 0.0.0.0 --port 8000
-```
-
-### 3. Pentest Backend
-```bash
-# Activate virtual environment
-venv\Scripts\activate  # Windows
-# or
-source venv/bin/activate  # Linux/Mac
-
-# Start server
-cd backend/pentest
-uvicorn api:app --reload --host 0.0.0.0 --port 8001
-```
-
-### 4. Frontend
+### 2. Frontend
 ```bash
 cd frontend_react
 npm install  # First time only
@@ -133,7 +98,6 @@ npm run dev
 If you see "port already in use" errors:
 - **Port 5000**: Stop any other Node.js services
 - **Port 8000**: Stop any other Python/FastAPI services
-- **Port 8001**: Stop any other Python/FastAPI services
 - **Port 5173**: Stop any other Vite/React dev servers
 
 ### Dependencies Not Found

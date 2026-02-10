@@ -1,0 +1,20 @@
+{
+  "name": "aegis-unified-backend",
+  "version": "1.0.0",
+  "description": "Unified Aegis backend combining auth, IDS, and pentest services",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "http-proxy": "^1.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
