@@ -24,7 +24,7 @@ import {
 import RecentAlertCard from "../components/alerts/RecentAlertCard";
 import { RecentAlertsList } from "../components/alerts/RecentAlertsList.tsx";
 import ThreatsDetectedCard from "../components/charts/ThreatsDetectedCard";
-import { StatCard, StatusPill, SeverityBadge } from "../components/common";
+import { StatCard, StatusPill, SeverityBadge, PageHeader } from "../components/common";
 import { useMockAwareMetrics } from "../components/dashboard/MockAwareMetrics.tsx";
 import { checkHealth, fetchLiveDetections, getPentestHistory, runPentest } from "../api/aegisClient";
 import { useAlertTimeSeries } from "../state/AlertTimeSeriesContext";
@@ -303,32 +303,29 @@ function DashboardPage() {
 
   return (
     <div className="aegis-page">
-      <header className="aegis-dash-header">
-        <div>
-          <h1 className="aegis-dash-title">Welcome Back, Sahar</h1>
-          <p className="aegis-dash-subtitle">
-            Your SME security overview and system activity summary.
-          </p>
-        </div>
-        <div className="ids-header-right-new">
-          {/* Unified Status pill */}
-          <StatusPill />
+      <PageHeader
+        showWelcome={true}
+        actions={
+          <div className="ids-header-right-new">
+            {/* Unified Status pill */}
+            <StatusPill />
 
-          {/* Refresh button */}
-          <button
-            type="button"
-            onClick={handleDashboardRefresh}
-            disabled={isRefreshing}
-            className={`ids-refresh-btn-neon ids-refresh-btn-neon--${idsStatus.status === 'error' ? 'error' :
-              idsStatus.status === 'warning' ? 'warning' :
-                'healthy'
-              }`}
-          >
-            <RotateCw className={`ids-refresh-icon ${isRefreshing ? 'animate-spin-slow' : ''}`} />
-            <span>Refresh</span>
-          </button>
-        </div>
-      </header>
+            {/* Refresh button */}
+            <button
+              type="button"
+              onClick={handleDashboardRefresh}
+              disabled={isRefreshing}
+              className={`ids-refresh-btn-neon ids-refresh-btn-neon--${idsStatus.status === 'error' ? 'error' :
+                idsStatus.status === 'warning' ? 'warning' :
+                  'healthy'
+                }`}
+            >
+              <RotateCw className={`ids-refresh-icon ${isRefreshing ? 'animate-spin-slow' : ''}`} />
+              <span>Refresh</span>
+            </button>
+          </div>
+        }
+      />
 
       {error && (
         <div style={{ padding: '1rem', background: '#fee', color: '#c00', borderRadius: '8px', margin: '1rem 0' }}>

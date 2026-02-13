@@ -2,6 +2,10 @@
  * useSystemStatus Hook
  * Manages global system status including mock stream state
  * Provides consistent status across all components
+ * 
+ * IMPORTANT: Mock mode and ML models are ALWAYS opposite:
+ * - Mock mode ON → ML models OFF (use fake data)
+ * - Mock mode OFF → ML models ON (use real ML predictions)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -10,7 +14,8 @@ import { checkHealth } from '../api/aegisClient';
 export interface SystemStatus {
   environment: 'ML Models' | 'Production';
   idsStatus: 'Healthy' | 'Warning' | 'Error' | 'Checking';
-  mockStream: 'ON' | 'OFF';
+  isMockMode: boolean;  // Changed from mockStream to isMockMode for clarity
+  mlModelsEnabled: boolean;  // Always opposite of isMockMode
   overallStatus: 'healthy' | 'warning' | 'error' | 'loading';
 }
 
@@ -18,20 +23,21 @@ export function useSystemStatus() {
   const [systemStatus, setSystemStatus] = useState<SystemStatus>({
     environment: 'ML Models',
     idsStatus: 'Checking',
-    mockStream: 'OFF',
+    isMockMode: false,  // Default: mock mode OFF
+    mlModelsEnabled: true,  // Default: ML models ON
     overallStatus: 'loading'
   });
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load mock stream state from localStorage
-  const loadMockStreamState = useCallback(() => {
+  // Load mock mode state from localStorage
+  const loadMockModeState = useCallback(() => {
     try {
-      const enabled = localStorage.getItem("aegis_mock_stream_enabled") === "true";
-      return enabled ? 'ON' : 'OFF';
+      const enabled = localStorage.getItem("aegis_mock_mode_enabled") === "true";
+      return enabled;
     } catch {
-      return 'OFF';
+      return false;  // Default to mock mode OFF
     }
   }, []);
 
@@ -43,9 +49,12 @@ export function useSystemStatus() {
 
       const healthData = await checkHealth();
       
+      // Get current mock mode state
+      const isMockMode = loadMockModeState();
+      const mlModelsEnabled = !isMockMode;  // Always opposite
+
       // Determine environment
-      const backendMode = healthData?.mode || healthData?.components?.database;
-      const environment = (backendMode === 'demo' || backendMode === 'static') ? 'ML Models' : 'Production';
+      const environment = isMockMode ? 'Production' : 'ML Models';
 
       // Determine IDS status
       let idsStatus: SystemStatus['idsStatus'] = 'Healthy';
@@ -65,13 +74,11 @@ export function useSystemStatus() {
         overallStatus = 'error';
       }
 
-      // Get current mock stream state
-      const mockStream = loadMockStreamState();
-
       setSystemStatus({
         environment,
         idsStatus,
-        mockStream,
+        isMockMode,
+        mlModelsEnabled,
         overallStatus
       });
 
@@ -85,22 +92,25 @@ export function useSystemStatus() {
     } finally {
       setLoading(false);
     }
-  }, [loadMockStreamState]);
+  }, [loadMockModeState]);
 
-  // Listen for mock stream toggle events
+  // Listen for mock mode toggle events
   useEffect(() => {
-    const handleMockStreamToggle = (event: CustomEvent) => {
-      const enabled = event.detail?.enabled ?? false;
+    const handleMockModeToggle = (event: CustomEvent) => {
+      const isMockMode = event.detail?.enabled ?? false;
+      const mlModelsEnabled = !isMockMode;  // Always opposite
+      
       setSystemStatus(prev => ({
         ...prev,
-        mockStream: enabled ? 'ON' : 'OFF'
+        isMockMode,
+        mlModelsEnabled
       }));
     };
 
-    window.addEventListener('mockStreamToggle', handleMockStreamToggle as EventListener);
+    window.addEventListener('mockModeToggle', handleMockModeToggle as EventListener);
     
     return () => {
-      window.removeEventListener('mockStreamToggle', handleMockStreamToggle as EventListener);
+      window.removeEventListener('mockModeToggle', handleMockModeToggle as EventListener);
     };
   }, []);
 
@@ -114,14 +124,17 @@ export function useSystemStatus() {
     return () => clearInterval(interval);
   }, [checkSystemHealth]);
 
-  // Update mock stream state on mount
+  // Update mock mode state on mount
   useEffect(() => {
-    const mockStream = loadMockStreamState();
+    const isMockMode = loadMockModeState();
+    const mlModelsEnabled = !isMockMode;
+    
     setSystemStatus(prev => ({
       ...prev,
-      mockStream
+      isMockMode,
+      mlModelsEnabled
     }));
-  }, [loadMockStreamState]);
+  }, [loadMockModeState]);
 
   return {
     systemStatus,

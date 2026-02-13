@@ -128,7 +128,7 @@ function AppShell({ children }) {
         <div className="aegis-sidebar-footer">
           <div className="aegis-user-pill">
             <div className="aegis-user-avatar">
-              {user?.email?.[0]?.toUpperCase() || "U"}
+              {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
             </div>
             <div className="aegis-user-meta">
               <div className="aegis-user-name">{user?.email || "User"}</div>

@@ -39,11 +39,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      if (!response.ok) throw new Error('Login failed');
-      const data = await response.json();
+      
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+      
+      if (!response.ok) throw new Error(data.message || 'Login failed');
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
+    } catch (error) {
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -58,16 +67,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
-      if (!response.ok) throw new Error('Registration failed');
-      const data = await response.json();
+      
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+      
+      if (!response.ok) throw new Error(data.message || 'Registration failed');
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
+    } catch (error) {
+      throw error;
     } finally {
       setIsLoading(false);
     }

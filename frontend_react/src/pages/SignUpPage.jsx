@@ -213,6 +213,17 @@ function SignUpPage() {
         >
           {loading ? "Creating Account..." : "Create Account"}
         </PrimaryButton>
+
+        <div className="aegis-login-footer">
+          <span>Already have an account? </span>
+          <button
+            type="button"
+            className="aegis-link"
+            onClick={() => navigate("/login")}
+          >
+            Log in
+          </button>
+        </div>
       </form>
     </AuthCardLayout>
   );

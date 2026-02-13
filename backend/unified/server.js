@@ -19,32 +19,45 @@ app.use(cors());
 app.use(express.json());
 
 // ============================================================================
-// Node.js Auth Routes (Port 5000)
+// Child Processes Management
 // ============================================================================
-import { connectDB } from "../../backend_auth/config/db.js";
-import authRoutes from "../../backend_auth/routes/auth.js";
-
-// Connect to MongoDB
-connectDB();
-
-// Auth routes
-app.use("/api/auth", authRoutes);
-
-// ============================================================================
-// Python FastAPI Services (IDS + Pentest)
-// ============================================================================
-// These run as child processes and are proxied through this Express server
-
+let authProcess = null;
 let pythonProcess = null;
+
+function startAuthBackend() {
+  return new Promise((resolve, reject) => {
+    console.log("🚀 Starting Auth Backend (Node.js)...");
+    
+    // Use node directly to run the auth backend server
+    authProcess = spawn("node", ["server.js"], {
+      cwd: path.resolve(__dirname, "../../backend_auth"),
+      stdio: "inherit",
+      env: { 
+        ...process.env,
+        PORT: "5001"  // Explicitly set port for auth backend
+      }
+    });
+
+    authProcess.on("error", (err) => {
+      console.error("❌ Failed to start Auth backend:", err);
+      reject(err);
+    });
+
+    authProcess.on("exit", (code) => {
+      console.log(`⚠️  Auth backend exited with code ${code}`);
+    });
+
+    // Give auth backend time to start
+    setTimeout(() => resolve(), 2000);
+  });
+}
 
 function startPythonBackend() {
   return new Promise((resolve, reject) => {
     console.log("🚀 Starting Python FastAPI backend (IDS + Pentest)...");
     
-    const pythonScript = path.join(__dirname, "../ids/serve/app.py");
-    
     pythonProcess = spawn("python", ["-m", "uvicorn", "backend.ids.serve.app:app", "--host", "0.0.0.0", "--port", "8000"], {
-      cwd: path.join(__dirname, "../../"),
+      cwd: path.resolve(__dirname, "../../"),
       stdio: "inherit",
       env: { ...process.env, PYTHONUNBUFFERED: "1" }
     });
@@ -64,6 +77,50 @@ function startPythonBackend() {
 }
 
 // ============================================================================
+// Proxy Setup
+// ============================================================================
+const authProxy = httpProxy.createProxyServer({
+  target: "http://localhost:5001",
+  changeOrigin: true
+});
+
+const pythonProxy = httpProxy.createProxyServer({
+  target: "http://localhost:8000",
+  changeOrigin: true,
+  ws: true
+});
+
+authProxy.on("error", (err, req, res) => {
+  console.error("Auth proxy error:", err);
+  res.status(503).json({ error: "Auth backend unavailable" });
+});
+
+pythonProxy.on("error", (err, req, res) => {
+  console.error("Python proxy error:", err);
+  res.status(503).json({ error: "Python backend unavailable" });
+});
+
+// ============================================================================
+// Route Proxying
+// ============================================================================
+// Auth routes proxy to port 5001
+app.use("/api/auth", (req, res) => authProxy.web(req, res));
+
+// Python backend routes
+app.use("/api/detection", (req, res) => pythonProxy.web(req, res));
+app.use("/api/evaluation", (req, res) => pythonProxy.web(req, res));
+app.use("/api/pentest", (req, res) => pythonProxy.web(req, res));
+app.use("/api/metrics", (req, res) => pythonProxy.web(req, res));
+app.use("/api/models", (req, res) => pythonProxy.web(req, res));
+app.use("/api/system", (req, res) => pythonProxy.web(req, res));
+app.use("/api/explainability", (req, res) => pythonProxy.web(req, res));
+app.use("/api/mock", (req, res) => pythonProxy.web(req, res));
+app.use("/api/alerts", (req, res) => pythonProxy.web(req, res));
+
+// WebSocket proxy
+app.use("/ws", (req, res) => pythonProxy.web(req, res));
+
+// ============================================================================
 // Health Check Endpoints
 // ============================================================================
 app.get("/health", (req, res) => {
@@ -71,7 +128,7 @@ app.get("/health", (req, res) => {
     status: "ok",
     message: "Unified Aegis backend is running",
     services: {
-      auth: "running (port 5000)",
+      auth: "running (port 5001)",
       ids: "running (port 8000)",
       pentest: "running (port 8000)"
     }
@@ -87,42 +144,6 @@ app.get("/api/health", (req, res) => {
 });
 
 // ============================================================================
-// Proxy Routes to Python Backend
-// ============================================================================
-// All /api/detection, /api/evaluation, /api/pentest, /ws routes are proxied to Python
-
-const proxy = httpProxy.createProxyServer({
-  target: "http://localhost:8000",
-  changeOrigin: true,
-  ws: true
-});
-
-proxy.on("error", (err, req, res) => {
-  console.error("Proxy error:", err);
-  res.status(503).json({ error: "Python backend unavailable" });
-});
-
-// Proxy all detection, evaluation, pentest, and metrics endpoints
-app.use("/api/detection", (req, res) => proxy.web(req, res));
-app.use("/api/evaluation", (req, res) => proxy.web(req, res));
-app.use("/api/pentest", (req, res) => proxy.web(req, res));
-app.use("/api/metrics", (req, res) => proxy.web(req, res));
-app.use("/api/models", (req, res) => proxy.web(req, res));
-app.use("/api/system", (req, res) => proxy.web(req, res));
-app.use("/api/explainability", (req, res) => proxy.web(req, res));
-app.use("/api/mock", (req, res) => proxy.web(req, res));
-app.use("/api/alerts", (req, res) => proxy.web(req, res));
-
-// Proxy WebSocket connections
-app.use("/ws", (req, res) => proxy.web(req, res));
-
-// Upgrade WebSocket connections
-const server = http.createServer(app);
-server.on("upgrade", (req, socket, head) => {
-  proxy.ws(req, socket, head);
-});
-
-// ============================================================================
 // Root Endpoint
 // ============================================================================
 app.get("/", (req, res) => {
@@ -131,8 +152,8 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     services: {
       auth: {
-        port: 5000,
-        endpoints: ["/api/auth/login", "/api/auth/signup", "/api/auth/forgot-password"]
+        port: 5001,
+        endpoints: ["/api/auth/login", "/api/auth/signup"]
       },
       ids: {
         port: 8000,
@@ -148,19 +169,30 @@ app.get("/", (req, res) => {
 });
 
 // ============================================================================
+// WebSocket Upgrade
+// ============================================================================
+const server = http.createServer(app);
+server.on("upgrade", (req, socket, head) => {
+  pythonProxy.ws(req, socket, head);
+});
+
+// ============================================================================
 // Startup
 // ============================================================================
 const PORT = process.env.PORT || 5000;
 
 async function start() {
   try {
-    // Start Python backend
+    // Start child processes
+    await startAuthBackend();
     await startPythonBackend();
     
     // Start Express server
     server.listen(PORT, () => {
       console.log(`\n✅ Aegis Unified Backend running on port ${PORT}`);
       console.log(`\n📍 Access Points:`);
+      console.log(`   Frontend:      http://localhost:5173`);
+      console.log(`   Unified API:   http://localhost:${PORT}`);
       console.log(`   Auth API:      http://localhost:${PORT}/api/auth`);
       console.log(`   IDS API:       http://localhost:8000/api/detection`);
       console.log(`   Pentest API:   http://localhost:8000/api/pentest`);
@@ -176,6 +208,9 @@ async function start() {
 // Graceful shutdown
 process.on("SIGINT", () => {
   console.log("\n🛑 Shutting down...");
+  if (authProcess) {
+    authProcess.kill();
+  }
   if (pythonProcess) {
     pythonProcess.kill();
   }
